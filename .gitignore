@@ -30,7 +30,8 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-
+/.env
+**/dev_env.json
 # Symbolication related
 app.*.symbols
 

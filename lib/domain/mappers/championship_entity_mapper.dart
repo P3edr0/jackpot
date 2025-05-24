@@ -2,13 +2,15 @@ import 'package:jackpot/domain/entities/championship_entity.dart';
 
 class ChampionshipEntityMapper {
   static ChampionshipEntity fromJson(Map<String, dynamic> data) {
+    final potValue = data['valorPote'].toString();
     return ChampionshipEntity(
-      id: data['id'],
-      name: data['name'],
+      id: data['idCampeonato'].toString(),
+      jackpotId: data['idJackPot'].toString(),
+      name: data['nomeCampeonato'],
       teams: [],
-      banner: data['bannerURL'],
-      potValue: data['potValue'] ?? '0',
-      title: data['title'] ?? '',
+      banner: data['bannerCampeonato'],
+      potValue: potValue,
+      title: data['title'] ?? data['nomeCampeonato'],
       isFavorite: data['isFavorite'] ?? false,
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
-import 'package:jackpot/theme/text_theme/colors.dart';
+
+import '../../theme/colors.dart';
 
 class Loading extends StatelessWidget {
   const Loading({super.key});

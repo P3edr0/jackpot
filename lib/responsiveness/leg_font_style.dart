@@ -22,6 +22,8 @@ abstract class JackFontStyle {
       .copyWith(fontSize: Responsive.getFontValue(18), color: Colors.black);
   static TextStyle body = GoogleFonts.roboto()
       .copyWith(fontSize: Responsive.getFontValue(14), color: Colors.black);
+  static TextStyle small = GoogleFonts.roboto()
+      .copyWith(fontSize: Responsive.getFontValue(12), color: Colors.black);
   static TextStyle verySmall = GoogleFonts.roboto()
       .copyWith(fontSize: Responsive.getFontValue(10), color: Colors.black);
   static TextStyle h0Bold = GoogleFonts.roboto().copyWith(
@@ -59,6 +61,11 @@ abstract class JackFontStyle {
       fontWeight: FontWeight.bold);
   static TextStyle bodyBold = GoogleFonts.roboto().copyWith(
       fontSize: Responsive.getFontValue(14),
+      color: Colors.black,
+      fontWeight: FontWeight.bold);
+
+  static TextStyle smallBold = GoogleFonts.roboto().copyWith(
+      fontSize: Responsive.getFontValue(12),
       color: Colors.black,
       fontWeight: FontWeight.bold);
   static TextStyle verySmallBold = GoogleFonts.roboto().copyWith(

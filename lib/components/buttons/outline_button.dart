@@ -1,26 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
-import 'package:jackpot/theme/text_theme/colors.dart';
+
+import '../../theme/colors.dart';
 
 class JackOutlineButton extends StatelessWidget {
   const JackOutlineButton(
-      {super.key, required this.child, required this.onTap});
-  final VoidCallback onTap;
+      {super.key,
+      required this.child,
+      required this.onTap,
+      this.borderColor = secondaryColor,
+      this.height = 32,
+      this.radius = 30,
+      this.borderWidth = 1,
+      this.width});
+  final VoidCallback? onTap;
   final Widget child;
+  final Color borderColor;
+  final double? width;
+  final double? height;
+  final double radius;
+  final double borderWidth;
 
   @override
   Widget build(BuildContext context) {
+    final handledWidth =
+        width != null ? Responsive.getHeightValue(width!) : null;
     return InkWell(
       onTap: onTap,
       child: Container(
+        height: Responsive.getHeightValue(height!),
+        width: handledWidth,
         alignment: Alignment.center,
         padding:
             EdgeInsets.symmetric(horizontal: Responsive.getHeightValue(20)),
-        height: Responsive.getHeightValue(32),
         decoration: BoxDecoration(
             color: transparent,
-            border: Border.all(color: secondaryColor, width: 1),
-            borderRadius: BorderRadius.circular(20)),
+            border: Border.all(color: borderColor, width: borderWidth),
+            borderRadius: BorderRadius.circular(radius)),
         child: child,
       ),
     );
