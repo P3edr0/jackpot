@@ -10,6 +10,7 @@ import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
 import 'package:jackpot/shared/utils/formatters/password_formatter.dart';
 import 'package:jackpot/shared/utils/routes/app_routes.dart';
+import 'package:jackpot/shared/utils/routes/route_observer.dart';
 import 'package:jackpot/theme/colors.dart';
 import 'package:provider/provider.dart';
 
@@ -135,6 +136,23 @@ class PasswordPageState extends State<PasswordPage> {
                       if (controller.hasError && context.mounted) {
                         ErrorDialog.show("Falha ao fazer login",
                             controller.exception!, context);
+                        return;
+                      }
+                      if (coreController.comingFromPayment) {
+                        coreController.setComingFromPayment(false);
+                        final routeObserver = RouteStackObserver.instance();
+                        if (routeObserver.currentStackNames
+                            .contains(AppRoutes.shoppingCart)) {
+                          Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              AppRoutes.payment,
+                              ModalRoute.withName(AppRoutes.shoppingCart));
+                          return;
+                        }
+                        Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            AppRoutes.payment,
+                            ModalRoute.withName(AppRoutes.couponSelect));
                         return;
                       }
                       if (coreController.haveUser && context.mounted) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 const primaryColor = Color.fromRGBO(31, 154, 30, 1);
+const pixColor = Color.fromRGBO(119, 182, 168, 1);
 const primaryFocusColor = Color.fromRGBO(30, 30, 30, 0.3);
 const gradientFocusColor = Color.fromRGBO(203, 203, 203, 0.2);
 const secondaryColor = Colors.white;
@@ -12,6 +13,7 @@ const darkBlue = Color.fromRGBO(38, 60, 88, 1);
 const bronze = Color.fromRGBO(153, 105, 83, 1);
 const silver = Color.fromRGBO(120, 118, 118, 1);
 const gold = Color.fromRGBO(226, 143, 14, 1);
+const warning = Colors.amber;
 
 const veryDarkBlue = Color.fromRGBO(0, 13, 29, 1);
 const mediumDarkBlue = Color.fromRGBO(0, 31, 59, 1);

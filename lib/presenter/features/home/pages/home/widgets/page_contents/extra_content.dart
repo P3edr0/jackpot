@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jackpot/components/cards/jack_card.dart';
 import 'package:jackpot/domain/entities/resume_jackpot_entity.dart';
+import 'package:jackpot/presenter/features/extra_jackpot/extra_jackpot_controller.dart';
 import 'package:jackpot/presenter/features/home/pages/home/store/home_controller.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/states_filter.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
+import 'package:jackpot/shared/utils/routes/app_routes.dart';
 import 'package:provider/provider.dart';
 
 class ExtraContent extends StatelessWidget {
@@ -31,14 +33,15 @@ class ExtraContent extends StatelessWidget {
                     final jack = jacks[index];
                     return JackCard(
                       onTap: () {
-                        // final jackController =
-                        //     Provider.of<JackpotTeamController>(context,
-                        //         listen: false);
-                        // jackController.setSelectedJackpotDetails(
-                        //     newId: jack.jackpotId.toString(),
-                        //     image: jack.banner,
-                        //     label: jack.title);
-                        // Navigator.pushNamed(context, AppRoutes.jackpotTeam);
+                        final extraJackController =
+                            Provider.of<ExtraJackpotController>(context,
+                                listen: false);
+                        extraJackController.setSelectedJackpotDetails(
+                            newId: jack.jackpotId.toString(),
+                            image: jack.banner,
+                            label: jack.title);
+                        Navigator.pushNamed(
+                            context, AppRoutes.extraCouponSelect);
                       },
                       title: jack.title,
                       constraints: constraints,

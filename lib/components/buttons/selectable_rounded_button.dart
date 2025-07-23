@@ -18,6 +18,7 @@ class JackSelectableRoundedButton extends StatefulWidget {
     this.withShader = true,
     this.borderColor = mediumGrey,
     this.borderWidth = 1,
+    this.padding = 20,
   });
   final bool isSelected;
   final bool withShader;
@@ -29,6 +30,7 @@ class JackSelectableRoundedButton extends StatefulWidget {
   final Widget? child;
   final Color borderColor;
   final double borderWidth;
+  final double padding;
   @override
   State<JackSelectableRoundedButton> createState() =>
       _JackSelectableRoundedButtonState();
@@ -51,6 +53,7 @@ class _JackSelectableRoundedButtonState
                 Rect.fromLTWH(0, 0, bounds.width, bounds.height),
               ),
           child: JackOutlineButton(
+              padding: widget.padding,
               radius: widget.radius,
               borderWidth: widget.borderWidth,
               height: widget.height,
@@ -67,6 +70,7 @@ class _JackSelectableRoundedButtonState
               style: JackFontStyle.body.copyWith(color: widget.borderColor),
             );
       return JackOutlineButton(
+          padding: widget.padding,
           radius: widget.radius,
           height: widget.height,
           width: widget.width,
@@ -83,6 +87,7 @@ class _JackSelectableRoundedButtonState
           );
 
     return JackRoundedButton(
+      padding: widget.padding,
       radius: widget.radius,
       height: widget.height,
       width: widget.width,

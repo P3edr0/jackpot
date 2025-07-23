@@ -89,10 +89,10 @@ class _CentralJackNavbarItemState extends State<CentralJackNavbarItem> {
         child: Stack(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(50),
+              borderRadius: BorderRadius.circular(40),
               child: Container(
-                height: Responsive.getHeightValue(66),
-                width: Responsive.getHeightValue(66),
+                height: Responsive.getHeightValue(65),
+                width: Responsive.getHeightValue(65),
                 alignment: Alignment.center,
                 decoration: const BoxDecoration(
                   gradient: primaryGradient,

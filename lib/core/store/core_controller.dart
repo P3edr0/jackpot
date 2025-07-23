@@ -2,29 +2,53 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:jackpot/data/datasources/auth/delete_user_datasource_impl.dart';
+import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/domain/entities/new_user_entity.dart';
+import 'package:jackpot/domain/entities/quick_purchase_user_entity.dart';
 import 'package:jackpot/domain/entities/session_entity.dart';
 import 'package:jackpot/domain/usecases/session/delete_session_usecase.dart';
 import 'package:jackpot/domain/usecases/session/get_session_usecase.dart';
 import 'package:jackpot/presenter/features/auth/login/login_store/login_controller.dart';
+import 'package:jackpot/presenter/features/shopping_cart/store/shopping_cart_controller.dart';
 import 'package:jackpot/shared/utils/enums/credential_type.dart';
 
 class CoreController extends ChangeNotifier {
   CoreController({
     required this.loginController,
+    required this.shoppingCartController,
     required this.getSessionUseCase,
     required this.deleteSessionUseCase,
   });
 
   ////////////////// VARS /////////////////////////
   final LoginController loginController;
+  final ShoppingCartController shoppingCartController;
   final GetSessionUseCase getSessionUseCase;
   final DeleteSessionUseCase deleteSessionUseCase;
   String recovererPasswordContent = '';
+  bool _comingFromPurchase = false;
 
   NewUserEntity? _currentUser;
+  QuickPurchaseUserEntity? _quickPurchaseUser;
   SessionEntity? _currentSession;
+
+  ////////////////// GETS /////////////////////////
+
+  bool get haveUser => _currentUser != null;
+  bool get haveQuickUser => _quickPurchaseUser != null;
+  bool get haveSession => _currentSession != null;
+  bool get comingFromPayment => _comingFromPurchase;
+  SessionEntity? get currentSession => _currentSession;
+  NewUserEntity? get user => _currentUser;
+  QuickPurchaseUserEntity? get quickUser => _quickPurchaseUser;
+
   ////////////////// FUNCTIONS /////////////////////////
+
+  void addShoppingCartItem(
+      JackpotEntity jackpot, int couponsQuantity, double couponsPrice) {
+    shoppingCartController.addShoppingCartItem(
+        jackpot, couponsQuantity, couponsPrice, user?.uzerId.toString());
+  }
 
   Future<void> login() async {
     final newUser = await loginController.login();
@@ -101,13 +125,6 @@ class CoreController extends ChangeNotifier {
     notifyListeners();
   }
 
-  ////////////////// GETS /////////////////////////
-
-  bool get haveUser => _currentUser != null;
-  bool get haveSession => _currentSession != null;
-  NewUserEntity? get user => _currentUser;
-  SessionEntity? get currentSession => _currentSession;
-
   ////////////////// SETS /////////////////////////
   int? setRecoverPassword(String letter, [isBackspace = false]) {
     if (isBackspace) {
@@ -126,6 +143,18 @@ class CoreController extends ChangeNotifier {
 
   void clearRecovererPasswordContent() {
     recovererPasswordContent = '';
+  }
+
+  void setQuickPurchaseUser(QuickPurchaseUserEntity newQuickUser) {
+    _quickPurchaseUser = newQuickUser;
+  }
+
+  setComingFromPayment([bool? value]) {
+    if (value != null) {
+      _comingFromPurchase = value;
+      return;
+    }
+    _comingFromPurchase = !_comingFromPurchase;
   }
 
   ////////////////////////// TEMP RECOVER PASSWORD ////////////////////

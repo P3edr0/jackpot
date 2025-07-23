@@ -4,6 +4,7 @@ import 'package:jackpot/shared/utils/enums/question_structure_type.dart';
 class ObjectiveQuestionEntity extends QuestionStructureEntity {
   ObjectiveQuestionEntity({
     super.questionStructureType = QuestionStructureType.objective,
+    required super.id,
     required this.options,
     required this.selectedList,
   });

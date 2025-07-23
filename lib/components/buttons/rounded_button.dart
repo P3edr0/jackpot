@@ -10,6 +10,7 @@ class JackRoundedButton extends StatelessWidget {
     required this.onTap,
     this.radius = 30,
     this.height = 32,
+    this.padding = 20,
     this.width,
   })  : isSolid = false,
         color = null;
@@ -20,12 +21,14 @@ class JackRoundedButton extends StatelessWidget {
       required this.color,
       this.height = 32,
       this.radius = 30,
+      this.padding = 20,
       this.width})
       : isSolid = true;
   final VoidCallback? onTap;
   final Widget child;
   final double? width;
   final double height;
+  final double padding;
   final double radius;
   final bool isSolid;
   final Color? color;
@@ -39,8 +42,8 @@ class JackRoundedButton extends StatelessWidget {
       child: Container(
         width: handledWidth,
         alignment: Alignment.center,
-        padding:
-            EdgeInsets.symmetric(horizontal: Responsive.getHeightValue(20)),
+        padding: EdgeInsets.symmetric(
+            horizontal: Responsive.getHeightValue(padding)),
         height: Responsive.getHeightValue(height),
         decoration: BoxDecoration(
             gradient: isSolid ? null : primaryGradient,

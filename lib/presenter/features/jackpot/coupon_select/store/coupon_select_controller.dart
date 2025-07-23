@@ -5,6 +5,7 @@ class CouponSelectController extends ChangeNotifier {
   CouponSelectController();
   //////////////////////// VARS //////////////////////////////
   CouponsBaseQuantity? _couponsBaseQuantity = CouponsBaseQuantity.five;
+  String? _oldReferenceJackpotId;
   int _couponsQuantity = 5;
   double _totalValue = 0;
   double _couponPrice = 0;
@@ -42,6 +43,17 @@ class CouponSelectController extends ChangeNotifier {
     if (needUpdate) notifyListeners();
   }
 
+  refreshPageDetails(String newJackpotId) {
+    if (newJackpotId != _oldReferenceJackpotId) {
+      _oldReferenceJackpotId = newJackpotId;
+      _couponsBaseQuantity = CouponsBaseQuantity.five;
+      _couponsQuantity = 5;
+      notifyListeners();
+
+      return;
+    }
+  }
+
   setLoading([bool? value]) {
     if (value == null) {
       _isLoading = !_isLoading;
@@ -64,6 +76,7 @@ class CouponSelectController extends ChangeNotifier {
 
   void setCouponPrice(double newValue) {
     _couponPrice = newValue;
+
     _updateTotalValue();
     notifyListeners();
   }

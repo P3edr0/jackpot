@@ -8,7 +8,7 @@ import 'package:jackpot/theme/colors.dart';
 class ConfirmDialog {
   const ConfirmDialog();
 
-  static Future<bool> show(String title, String content, BuildContext context,
+  static Future<bool?> show(String title, String content, BuildContext context,
       VoidCallback confirmCallback) async {
     return await showDialog(
         context: context,

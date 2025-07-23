@@ -23,17 +23,5 @@ class AddressMapper {
       "numero": address.number,
       "cidade": {"id": address.cityCode, "nome": address.city}
     };
-
-    // {
-//                     "cep": cadastroUsuario!.endereco!.cep, //"74594001"
-//                     "logradouro": cadastroUsuario!.endereco!.logradouro,
-//                     "complemento": cadastroUsuario!.endereco!.complemento,
-//                     "bairro": cadastroUsuario!.endereco!.bairro,
-//                     "numero": cadastroUsuario!.endereco!.numero,
-//                     "cidade": {
-//                       "id": cadastroUsuario!.endereco!.cidade!.id,
-//                       "nome": cadastroUsuario!.endereco!.cidade!.nome
-//                     }
-//                   },
   }
 }

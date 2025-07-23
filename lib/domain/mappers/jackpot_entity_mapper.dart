@@ -20,6 +20,7 @@ class JackpotEntityMapper {
 
     return JackpotEntity(
         id: data['id'].toString(),
+        betId: data['betId'].toString(),
         championship: ResumeChampionshipEntity.empty(championshipId),
         banner: data['bannerUrl'],
         potValue: data['potValue'],

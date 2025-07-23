@@ -69,7 +69,7 @@ class _JackDropdownState extends State<JackDropdown> {
                 AnimatedRotation(
                     turns: controller.isOpen ? 0.5 : 0,
                     duration: const Duration(milliseconds: 500),
-                    child: Icon(Icons.arrow_drop_down,
+                    child: Icon(Icons.expand_more,
                         size: 20,
                         color: widget.controller.text.isEmpty || !widget.isValid
                             ? mediumGrey

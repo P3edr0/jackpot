@@ -12,14 +12,21 @@ import 'package:jackpot/presenter/features/auth/login/password_recover_email_pag
 import 'package:jackpot/presenter/features/auth/login/password_recover_page.dart';
 import 'package:jackpot/presenter/features/auth/login/pre_create_user_page.dart';
 import 'package:jackpot/presenter/features/auth/login/welcome_page.dart';
+import 'package:jackpot/presenter/features/extra_jackpot/coupon_select/extra_coupon_select_page.dart';
 import 'package:jackpot/presenter/features/home/pages/home/home_page.dart';
 import 'package:jackpot/presenter/features/home/pages/profile/profile_page.dart';
 import 'package:jackpot/presenter/features/jackpot/coupon_select/coupon_select_page.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_championship/jackpot_championship_page.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_questions/jackpot_questions_page.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_team/jackpot_team_page.dart';
+import 'package:jackpot/presenter/features/jackpot/my_jackpots/pages/my_jackpots/my_jackpots_page.dart';
+import 'package:jackpot/presenter/features/jackpot/my_jackpots/pages/my_jackpots_details/my_jackpots_details_page.dart';
+import 'package:jackpot/presenter/features/jackpot/quick_purchase/quick_purchase_page.dart';
 import 'package:jackpot/presenter/features/lgpd/pages/lgpd/lgpd_page.dart';
 import 'package:jackpot/presenter/features/lgpd/pages/viewer_docs/viewer_docs_page.dart';
+import 'package:jackpot/presenter/features/payment/pages/payment_page.dart';
+import 'package:jackpot/presenter/features/payment/pages/pix_page/pix_page.dart';
+import 'package:jackpot/presenter/features/shopping_cart/shopping_cart_page.dart';
 import 'package:jackpot/presenter/features/splash/splash_page.dart';
 
 class AppRoutes {
@@ -29,6 +36,7 @@ class AppRoutes {
   static const jackpotChampionship = '/jackpot_championship';
   static const welcome = '/welcome';
   static const couponSelect = '/coupon_select';
+  static const extraCouponSelect = '/extra_coupon_select';
   static const jackpotQuestions = '/questions';
   static const preCreateUser = '/pre_create_user';
   static const createUserOne = '/create_user_one';
@@ -40,12 +48,18 @@ class AppRoutes {
   static const profile = '/profile';
   static const viewerDocs = '/viewer_docs';
   static const login = '/login';
+  static const payment = '/payment';
   static const captureFace = '/captureFace';
   static const previewCapturedFace = '/previewCapturedFace';
   static const password = '/password';
   static const passwordRecover = '/password_recover';
   static const passwordRecoverEmail = '/password_recover_email';
   static const help = '/help';
+  static const myJackpots = '/my_jackpots';
+  static const myJackpotsDetails = '/my_jackpots_details';
+  static const shoppingCart = '/shopping_cart';
+  static const qrCodePix = '/qr_code_pix';
+  static const quickPurchase = '/quick_purchase';
 
   static final routes = {
     AppRoutes.splash: (ctx) => const SplashPage(),
@@ -54,6 +68,7 @@ class AppRoutes {
     AppRoutes.jackpotChampionship: (ctx) => const JackpotChampionshipPage(),
     AppRoutes.profile: (ctx) => const ProfilePage(),
     AppRoutes.couponSelect: (ctx) => const CouponSelectPage(),
+    AppRoutes.extraCouponSelect: (ctx) => const ExtraCouponSelectPage(),
     AppRoutes.jackpotQuestions: (ctx) => const JackpotQuestionsPage(),
     AppRoutes.viewerDocs: (ctx) => const ViewerDocsPage(),
     AppRoutes.preCreateUser: (ctx) => const PreCreateUserPage(),
@@ -71,5 +86,11 @@ class AppRoutes {
     AppRoutes.captureFace: (ctx) => const FaceCapturePage(),
     AppRoutes.previewCapturedFace: (ctx) => const PreviewCapturedFacePage(),
     AppRoutes.photoHelp: (ctx) => const PhotoHelpPage(),
+    AppRoutes.payment: (ctx) => const PaymentPage(),
+    AppRoutes.myJackpots: (ctx) => const MyJackpotsPage(),
+    AppRoutes.myJackpotsDetails: (ctx) => const MyJackpotsDetailsPage(),
+    AppRoutes.shoppingCart: (ctx) => const ShoppingCartPage(),
+    AppRoutes.qrCodePix: (ctx) => const PixPage(),
+    AppRoutes.quickPurchase: (ctx) => const QuickPurchasePage(),
   };
 }

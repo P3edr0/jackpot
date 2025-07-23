@@ -27,7 +27,6 @@ class JackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final bool isLargeValue = (int.tryParse(potValue) ?? 0) > 9.999;
     final String handledTitle = title.isEmpty ? 'CONCORRA A PRÊMIOS' : title;
     return InkWell(
       onTap: onTap,
@@ -47,19 +46,18 @@ class JackCard extends StatelessWidget {
               children: [
                 ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      image,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        final value = loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null;
-                        return LoadingContent(value: value);
-                      },
-                      errorBuilder: (context, error, stackTrace) =>
-                          Image.asset(AppAssets.splash),
-                    )),
+                    child: Image.network(image,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          final value =
+                              loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null;
+                          return LoadingContent(value: value);
+                        },
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset(AppAssets.splash))),
                 Positioned(
                     top: 8,
                     right: 8,

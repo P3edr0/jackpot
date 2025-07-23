@@ -21,6 +21,7 @@ class JackTextfield extends StatefulWidget {
       this.onEditingComplete,
       this.inputType = TextInputType.emailAddress,
       this.inputAction = TextInputAction.done,
+      this.maxLength,
       this.radius = 10});
   final TextEditingController controller;
   final String hint;
@@ -34,6 +35,7 @@ class JackTextfield extends StatefulWidget {
   final TextInputType inputType;
   final TextInputAction inputAction;
   final double radius;
+  final int? maxLength;
   final List<TextInputFormatter>? formatter;
   final Function(String)? onChanged;
   final Function()? onEditingComplete;
@@ -94,6 +96,7 @@ class _JackTextfieldState extends State<JackTextfield> {
             controller: widget.controller,
             validator: widget.validator,
             onChanged: widget.onChanged,
+            maxLength: widget.maxLength,
           ),
         ),
       ],

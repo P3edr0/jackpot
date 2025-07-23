@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:jackpot/components/appbar/appbar.dart';
+import 'package:jackpot/components/appbar/appbar_secondary.dart';
 import 'package:jackpot/components/buttons/selectable_rounded_button.dart';
 import 'package:jackpot/components/cards/banner_card.dart';
 import 'package:jackpot/components/cards/championship_jack_card.dart';
 import 'package:jackpot/components/loadings/loading.dart';
+import 'package:jackpot/components/shopping_cart_item.dart';
 import 'package:jackpot/components/textfields/textfield.dart';
 import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_bar.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_championship/store/jackpot_championship_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/store/jackpot_controller.dart';
+import 'package:jackpot/presenter/features/shopping_cart/store/shopping_cart_controller.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
 import 'package:jackpot/shared/utils/enums/jack_filters_type.dart';
@@ -217,7 +219,7 @@ class _JackpotChampionshipPageState extends State<JackpotChampionshipPage> {
                                                                             false);
                                                                 jackController
                                                                     .setSelectedJackpot(
-                                                                        jack);
+                                                                        [jack]);
                                                                 Navigator.pushNamed(
                                                                     context,
                                                                     AppRoutes
@@ -249,33 +251,55 @@ class _JackpotChampionshipPageState extends State<JackpotChampionshipPage> {
                                       Positioned(
                                         top: 0,
                                         child: Container(
-                                          alignment: Alignment.topCenter,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal:
-                                                  Responsive.getHeightValue(
-                                                      16)),
-                                          decoration: const BoxDecoration(
-                                              gradient: secondaryGradient,
-                                              borderRadius: BorderRadius.only(
-                                                  bottomRight:
-                                                      Radius.circular(20),
-                                                  bottomLeft:
-                                                      Radius.circular(20))),
-                                          width: constraints.maxWidth,
-                                          height:
-                                              Responsive.getHeightValue(180),
-                                          child: Selector<JackpotController,
-                                              String>(
-                                            selector: (context, controller) =>
-                                                controller.selectedJackpotLabel,
-                                            builder: (context, label, child) =>
-                                                JackAppBar.transparent(
-                                              title: label,
-                                              alignment:
-                                                  MainAxisAlignment.start,
-                                            ),
-                                          ),
-                                        ),
+                                            alignment: Alignment.topCenter,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal:
+                                                    Responsive.getHeightValue(
+                                                        3)),
+                                            decoration: const BoxDecoration(
+                                                gradient: secondaryGradient,
+                                                borderRadius: BorderRadius.only(
+                                                    bottomRight:
+                                                        Radius.circular(20),
+                                                    bottomLeft:
+                                                        Radius.circular(20))),
+                                            width: constraints.maxWidth,
+                                            height:
+                                                Responsive.getHeightValue(180),
+                                            child: Consumer2<
+                                                    JackpotChampionshipController,
+                                                    ShoppingCartController>(
+                                                builder: (context,
+                                                        jackpotChampionshipController,
+                                                        shoppingCartController,
+                                                        child) =>
+                                                    JackAppBarSecondary(
+                                                        isTransparent: true,
+                                                        alignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        child: Expanded(
+                                                            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                                          Text(
+                                                            jackpotChampionshipController
+                                                                .selectedChampionshipName,
+                                                            style: JackFontStyle
+                                                                .title
+                                                                .copyWith(
+                                                                    color:
+                                                                        secondaryColor),
+                                                          ),
+                                                          JackCartIcon(
+                                                            itemCount:
+                                                                shoppingCartController
+                                                                    .totalCoupons,
+                                                            onTap: () async =>
+                                                                Navigator.pushNamed(
+                                                                    context,
+                                                                    AppRoutes
+                                                                        .shoppingCart),
+                                                          ),
+                                                        ]))))),
                                       ),
                                       Positioned(
                                           top: Responsive.getHeightValue(100),

@@ -12,7 +12,8 @@ class JackOutlineButton extends StatelessWidget {
       this.height = 32,
       this.radius = 30,
       this.borderWidth = 1,
-      this.width});
+      this.width,
+      this.padding = 20});
   final VoidCallback? onTap;
   final Widget child;
   final Color borderColor;
@@ -20,6 +21,7 @@ class JackOutlineButton extends StatelessWidget {
   final double? height;
   final double radius;
   final double borderWidth;
+  final double padding;
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +33,8 @@ class JackOutlineButton extends StatelessWidget {
         height: Responsive.getHeightValue(height!),
         width: handledWidth,
         alignment: Alignment.center,
-        padding:
-            EdgeInsets.symmetric(horizontal: Responsive.getHeightValue(20)),
+        padding: EdgeInsets.symmetric(
+            horizontal: Responsive.getHeightValue(padding)),
         decoration: BoxDecoration(
             color: transparent,
             border: Border.all(color: borderColor, width: borderWidth),

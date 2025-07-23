@@ -4,14 +4,17 @@ import 'package:flutter_svg/svg.dart';
 import 'package:jackpot/components/buttons/outline_button.dart';
 import 'package:jackpot/components/dialogs/quit_app_dialog.dart';
 import 'package:jackpot/components/loadings/loading.dart';
+import 'package:jackpot/components/shopping_cart_item.dart';
 import 'package:jackpot/core/store/core_controller.dart';
 import 'package:jackpot/presenter/features/home/pages/home/store/home_controller.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_bar.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/page_contents/extra_content.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/page_contents/sport_content.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/tabs.dart';
+import 'package:jackpot/presenter/features/shopping_cart/store/shopping_cart_controller.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
+import 'package:jackpot/shared/utils/enums/tab_navigation_options.dart';
 import 'package:jackpot/shared/utils/routes/app_routes.dart';
 import 'package:provider/provider.dart';
 
@@ -34,6 +37,10 @@ class _HomePageState extends State<HomePage> {
 
     controller = Provider.of<HomeController>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!controller.selectedTabNavigationOption.isHome) {
+        controller.setSelectedJackNavbarTab(JackTabNavigationOptions.home);
+        Navigator.pushNamed(context, AppRoutes.home);
+      }
       await controller.startHomePage();
     });
   }
@@ -155,19 +162,16 @@ class _HomePageState extends State<HomePage> {
                                                 Row(
                                                   children: [
                                                     InkWell(
-                                                      onTap: () async {
-                                                        final controller = Provider
-                                                            .of<CoreController>(
-                                                                context,
-                                                                listen: false);
-                                                        await controller
-                                                            .getSession();
-                                                      },
+                                                      onTap: () async =>
+                                                          Navigator.pushNamed(
+                                                              context,
+                                                              AppRoutes
+                                                                  .shoppingCart),
                                                       child: SvgPicture.asset(
                                                         AppAssets
                                                             .notificationSvg,
                                                         semanticsLabel:
-                                                            'Shopping Cart',
+                                                            'Notifications',
                                                         height: Responsive
                                                             .getHeightValue(24),
                                                       ),
@@ -176,13 +180,25 @@ class _HomePageState extends State<HomePage> {
                                                       width: Responsive
                                                           .getHeightValue(30),
                                                     ),
-                                                    SvgPicture.asset(
-                                                      AppAssets.shoppingCartSvg,
-                                                      semanticsLabel:
-                                                          'Shopping Cart',
-                                                      height: Responsive
-                                                          .getHeightValue(24),
-                                                    ),
+                                                    Selector<
+                                                        ShoppingCartController,
+                                                        int>(
+                                                      selector: (ctx,
+                                                              shoppingCartController) =>
+                                                          shoppingCartController
+                                                              .totalCoupons,
+                                                      builder: (context,
+                                                              quantity,
+                                                              child) =>
+                                                          JackCartIcon(
+                                                        itemCount: quantity,
+                                                        onTap: () async =>
+                                                            Navigator.pushNamed(
+                                                                context,
+                                                                AppRoutes
+                                                                    .shoppingCart),
+                                                      ),
+                                                    )
                                                   ],
                                                 ),
                                               ],

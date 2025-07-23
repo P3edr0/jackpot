@@ -19,6 +19,7 @@ class AppAssets {
 
   ////////   IMAGES   ////////
   static const String allAppsBanner = "assets/images/all_apps_banner.png";
+  static const String pagSeguro = "assets/images/pagseguro.png";
   static const String activeLine = "assets/images/active_line.png";
   static const String uzerpass = "assets/images/uzerpass.png";
   static const String uzerpassDevelopBy = "assets/images/develop_by.png";

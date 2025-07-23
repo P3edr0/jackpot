@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jackpot/presenter/features/home/pages/home/store/home_controller.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_item.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
+import 'package:jackpot/shared/utils/routes/app_routes.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../../../shared/utils/app_assets.dart';
@@ -35,15 +36,25 @@ class _JackBottomNavigationBarState extends State<JackBottomNavigationBar> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               JackNavbarItem(
-                onTap: () => controller
-                    .setSelectedJackNavbarTab(JackTabNavigationOptions.home),
+                onTap: () async {
+                  if (!controller.selectedTabNavigationOption.isHome) {
+                    controller.setSelectedJackNavbarTab(
+                        JackTabNavigationOptions.home);
+                    Navigator.pushNamed(context, AppRoutes.home);
+                  }
+                },
                 label: 'Home',
                 svgIcon: AppAssets.homeSvg,
                 isSelected: controller.selectedTabNavigationOption.isHome,
               ),
               JackNavbarItem(
-                onTap: () => controller
-                    .setSelectedJackNavbarTab(JackTabNavigationOptions.jacks),
+                onTap: () async {
+                  if (!controller.selectedTabNavigationOption.isJacks) {
+                    controller.setSelectedJackNavbarTab(
+                        JackTabNavigationOptions.jacks);
+                    Navigator.pushNamed(context, AppRoutes.myJackpots);
+                  }
+                },
                 label: 'Meus Jacks',
                 svgIcon: AppAssets.bagSvg,
                 isSelected: controller.selectedTabNavigationOption.isJacks,

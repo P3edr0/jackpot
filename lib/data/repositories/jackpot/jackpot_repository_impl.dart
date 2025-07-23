@@ -1,8 +1,12 @@
 import 'package:dartz/dartz.dart';
+import 'package:jackpot/data/datasources/base_datasources/jackpot/bet/create_bet_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/fetch_all_team_jackpot_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/get_jackpot_datasource.dart';
+import 'package:jackpot/data/datasources/base_datasources/jackpot/group_by_championship_jackpot_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/list_by_championship_jackpot_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/list_by_team_jackpot_datasource.dart';
+import 'package:jackpot/domain/entities/bet_entity.dart';
+import 'package:jackpot/domain/entities/championship_entity.dart';
 import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/domain/entities/preview_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/team_entity.dart';
@@ -53,6 +57,29 @@ class ListByChampionshipJackpotRepositoryImpl
   Future<Either<IJackExceptions, List<PreviewJackpotEntity>>> call(
       String championshipId) async {
     final response = await datasource(championshipId);
+    return response;
+  }
+}
+
+class GroupByChampionshipJackpotRepositoryImpl
+    implements IGroupByChampionshipJackpotRepository {
+  GroupByChampionshipJackpotRepositoryImpl({required this.datasource});
+  IGroupByChampionshipJackpotDatasource datasource;
+
+  @override
+  Future<Either<IJackExceptions, List<ChampionshipEntity>>> call() async {
+    final response = await datasource();
+    return response;
+  }
+}
+
+class CreateBetRepositoryImpl implements ICreateBetRepository {
+  CreateBetRepositoryImpl({required this.datasource});
+  ICreateBetDatasource datasource;
+
+  @override
+  Future<Either<IJackExceptions, bool>> call(BetEntity bet) async {
+    final response = await datasource(bet);
     return response;
   }
 }

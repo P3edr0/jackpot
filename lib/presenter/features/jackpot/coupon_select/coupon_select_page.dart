@@ -1,13 +1,22 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:jackpot/components/appbar/appbar.dart';
+import 'package:jackpot/components/appbar/appbar_secondary.dart';
 import 'package:jackpot/components/buttons/rounded_button.dart';
 import 'package:jackpot/components/buttons/selectable_rounded_button.dart';
+import 'package:jackpot/components/cards/buy_resume_card.dart';
 import 'package:jackpot/components/cards/match_card.dart';
+import 'package:jackpot/components/shopping_cart_item.dart';
+import 'package:jackpot/core/store/core_controller.dart';
 import 'package:jackpot/domain/entities/jackpot_entity.dart';
+import 'package:jackpot/domain/entities/shopping_cart_jackpot_entity.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_bar.dart';
 import 'package:jackpot/presenter/features/jackpot/coupon_select/store/coupon_select_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_questions/store/jackpot_questions_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/store/jackpot_controller.dart';
+import 'package:jackpot/presenter/features/payment/pages/components/logged_user_content.dart';
+import 'package:jackpot/presenter/features/payment/pages/store/payment_controller.dart';
+import 'package:jackpot/presenter/features/shopping_cart/store/shopping_cart_controller.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
 import 'package:jackpot/shared/utils/enums/coupons_base_quantity.dart';
@@ -24,7 +33,16 @@ class CouponSelectPage extends StatefulWidget {
   State<CouponSelectPage> createState() => _CouponSelectPageState();
 }
 
-class _CouponSelectPageState extends State<CouponSelectPage> {
+class _CouponSelectPageState extends State<CouponSelectPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _positionAnimation;
+  late Animation<double> _sizeAnimation;
+  late Animation<double> _opacityAnimation;
+
+  OverlayEntry? _overlayEntry;
+  bool _isAnimating = false;
+
   late CouponSelectController controller;
   late JackpotController jackController;
   double couponPrice = 0;
@@ -34,15 +52,97 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
     super.initState();
     controller = Provider.of<CouponSelectController>(context, listen: false);
     jackController = Provider.of<JackpotController>(context, listen: false);
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
 
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _overlayEntry?.remove();
+        _overlayEntry = null;
+        _isAnimating = false;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cartela adicionada ao carrinho!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final stringCouponPrice = jackController.selectedJackpot!.budgetValue;
+      final stringCouponPrice =
+          jackController.selectedJackpot!.first.budgetValue;
+      final jackpotId = jackController.selectedJackpot!.first.id;
       final handledCouponPrice = double.parse(stringCouponPrice);
       controller.setCouponPrice(handledCouponPrice);
+      controller.refreshPageDetails(jackpotId);
       setState(() {
         couponPrice = handledCouponPrice;
       });
     });
+  }
+
+  void _addToCart(Offset startPosition, String image) {
+    final bytes = base64Decode(image);
+    if (_isAnimating) return;
+    _isAnimating = true;
+
+    setState(() {
+      _positionAnimation = Tween<Offset>(
+        begin: startPosition,
+        end: Offset(MediaQuery.of(context).size.width, -100),
+      ).animate(CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeIn,
+      ));
+
+      _sizeAnimation = Tween<double>(begin: 1.0, end: 0.3).animate(_controller);
+      _opacityAnimation =
+          Tween<double>(begin: 1.0, end: 0.5).animate(_controller);
+    });
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Positioned(
+            left: _positionAnimation.value.dx - 30,
+            top: _positionAnimation.value.dy - 30,
+            child: Transform.scale(
+              scale: _sizeAnimation.value,
+              child: Opacity(
+                opacity: _opacityAnimation.value,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      )
+                    ],
+                  ),
+                  child: Image.memory(
+                    bytes,
+                    width: 80,
+                    height: 80,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+    _controller.reset();
+    _controller.forward();
   }
 
   @override
@@ -57,10 +157,23 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
                     child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    const JackAppBar.transparent(
-                      title: null,
-                      alignment: MainAxisAlignment.start,
-                    ),
+                    Consumer<ShoppingCartController>(
+                        builder: (context, shoppingCartController, child) =>
+                            JackAppBarSecondary(
+                                isTransparent: false,
+                                alignment: MainAxisAlignment.start,
+                                child: Expanded(
+                                    child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                      JackCartIcon(
+                                        itemCount:
+                                            shoppingCartController.totalCoupons,
+                                        onTap: () async => Navigator.pushNamed(
+                                            context, AppRoutes.shoppingCart),
+                                      ),
+                                    ])))),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
@@ -71,7 +184,7 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
                           ),
                           Selector<JackpotController, JackpotEntity>(
                               selector: (context, controller) =>
-                                  controller.selectedJackpot!,
+                                  controller.selectedJackpot!.first,
                               builder: (context, jackpot, child) {
                                 return MatchCard(
                                   constraints: constraints,
@@ -97,9 +210,13 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
                                             listen: false);
                                     final jackpot =
                                         jackController.selectedJackpot;
-
+                                    final handledJackpot =
+                                        JackpotAggregateEntity(
+                                            couponPrice: 00,
+                                            couponsQuantity: 1,
+                                            jackpot: jackpot!.first);
                                     questionsController.setIsQuestionsPreview(
-                                        true, jackpot!);
+                                        true, [handledJackpot]);
                                     Navigator.pushNamed(
                                         context, AppRoutes.jackpotQuestions);
                                   },
@@ -264,6 +381,7 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
                                 builder: (_, couponQuantity, __) =>
                                     JackSelectableRoundedButton(
                                   height: 44,
+                                  padding: 0,
                                   withShader:
                                       controller.couponsBaseQuantity == null,
                                   radius: 8,
@@ -276,26 +394,32 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
                                       InkWell(
                                         onTap: () =>
                                             controller.subtractCoupon(),
-                                        child: const Icon(
-                                          Icons.remove,
-                                          size: 26,
-                                          color: mediumGrey,
+                                        child: const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          child: Icon(
+                                            Icons.remove,
+                                            size: 26,
+                                            color: mediumGrey,
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(width: 10),
                                       Text(
                                         '$couponQuantity',
                                         style: JackFontStyle.h4Bold.copyWith(
                                             fontWeight: FontWeight.w900,
                                             color: mediumGrey),
                                       ),
-                                      const SizedBox(width: 10),
                                       InkWell(
                                         onTap: () => controller.addCoupon(),
-                                        child: const Icon(
-                                          Icons.add,
-                                          size: 26,
-                                          color: mediumGrey,
+                                        child: const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          child: Icon(
+                                            Icons.add,
+                                            size: 26,
+                                            color: mediumGrey,
+                                          ),
                                         ),
                                       )
                                     ],
@@ -332,65 +456,12 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
                           color: secondaryColor),
                       child: Column(
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                gradient: secondaryGradient),
-                            padding: const EdgeInsets.all(16),
-                            child: Row(
-                              children: [
-                                Selector<CouponSelectController, int>(
-                                  selector: (_, controller) =>
-                                      controller.couponsQuantity,
-                                  builder: (context, couponsQuantity, child) =>
-                                      Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Qtde. Cupons',
-                                        style: JackFontStyle.small
-                                            .copyWith(color: secondaryColor),
-                                      ),
-                                      SizedBox(
-                                        height: Responsive.getHeightValue(10),
-                                      ),
-                                      Text(
-                                        '$couponsQuantity',
-                                        style: JackFontStyle.h3Bold
-                                            .copyWith(color: secondaryColor),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Spacer(),
-                                Selector<CouponSelectController, double>(
-                                  selector: (_, controller) =>
-                                      controller.totalValue,
-                                  builder: (context, totalValue, child) =>
-                                      Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        'Total',
-                                        style: JackFontStyle.small
-                                            .copyWith(color: secondaryColor),
-                                      ),
-                                      SizedBox(
-                                        height: Responsive.getHeightValue(10),
-                                      ),
-                                      Text(
-                                        MoneyFormat.toReal(
-                                            totalValue.toString()),
-                                        style: JackFontStyle.h3Bold
-                                            .copyWith(color: secondaryColor),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
+                          Consumer<CouponSelectController>(
+                              builder: (context, controller, child) =>
+                                  BuyResumeCard(
+                                    couponsQuantity: controller.couponsQuantity,
+                                    totalValue: controller.totalValue,
+                                  )),
                           SizedBox(
                             height: Responsive.getHeightValue(20),
                           ),
@@ -404,7 +475,29 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
                                   isSelected: false,
                                   borderColor: darkBlue,
                                   borderWidth: 2,
-                                  onTap: () {},
+                                  onTap: () {
+                                    final jackpot =
+                                        jackController.selectedJackpot!;
+                                    final couponsQuantity =
+                                        controller.couponsQuantity;
+                                    final couponsPrice = controller.couponPrice;
+                                    final image = jackController
+                                        .selectedJackpot!.first.banner;
+                                    coreController =
+                                        Provider.of<CoreController>(context,
+                                            listen: false);
+                                    _addToCart(
+                                        Offset(
+                                          MediaQuery.of(context).size.width / 2,
+                                          MediaQuery.of(context).size.height /
+                                              2,
+                                        ),
+                                        image);
+                                    coreController.addShoppingCartItem(
+                                        jackpot.first,
+                                        couponsQuantity,
+                                        couponsPrice);
+                                  },
                                   child: Text(
                                     'Adicionar ao carrinho',
                                     style: JackFontStyle.bodyBold
@@ -420,17 +513,38 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
                                   onTap: () async {
                                     final couponsQuantity =
                                         controller.couponsQuantity;
+                                    final totalValue = controller.totalValue;
                                     final questionsController =
                                         Provider.of<JackpotQuestionsController>(
                                             context,
                                             listen: false);
+                                    final paymentController =
+                                        Provider.of<PaymentController>(context,
+                                            listen: false);
+
                                     final jackpot =
                                         jackController.selectedJackpot;
-
+                                    jackController
+                                        .setSelectedJackpot([jackpot!.first]);
+                                    paymentController.setPaymentData(
+                                        newCouponsQuantity: couponsQuantity,
+                                        newTotalValue: totalValue,
+                                        newUnitValue: controller.couponPrice,
+                                        newPaymentCouponsQuantity:
+                                            couponsQuantity,
+                                        newItemPaymentDescription:
+                                            "JACKPOT ${jackpot.first.jackpotOwnerTeam.name} - ID ${jackpot.first.id}",
+                                        newItemDescription:
+                                            "JACKPOT ${jackpot.first.jackpotOwnerTeam.name}");
+                                    final handledJackpot =
+                                        JackpotAggregateEntity(
+                                            couponPrice: 00,
+                                            couponsQuantity: couponsQuantity,
+                                            jackpot: jackpot.first);
                                     questionsController.setIsQuestionsPreview(
-                                        false, jackpot!, couponsQuantity);
+                                        false, [handledJackpot]);
                                     Navigator.pushNamed(
-                                        context, AppRoutes.jackpotQuestions);
+                                        context, AppRoutes.payment);
                                   },
                                   child: Text(
                                     'Comprar',

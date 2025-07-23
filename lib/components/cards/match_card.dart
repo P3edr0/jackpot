@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:jackpot/components/buttons/rounded_button.dart';
 import 'package:jackpot/domain/entities/team_entity.dart';
@@ -66,6 +68,9 @@ class MatchCard extends StatelessWidget {
                                 Image.network(
                                   homeTeam.logo,
                                   height: 60,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Image.memory(base64Decode(homeTeam.logo),
+                                          height: 60),
                                 ),
                                 SizedBox(
                                   height: Responsive.getHeightValue(6),
@@ -87,6 +92,9 @@ class MatchCard extends StatelessWidget {
                                 Image.network(
                                   visitTeam.logo,
                                   height: 60,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Image.memory(base64Decode(visitTeam.logo),
+                                          height: 60),
                                 ),
                                 SizedBox(
                                   height: Responsive.getHeightValue(6),

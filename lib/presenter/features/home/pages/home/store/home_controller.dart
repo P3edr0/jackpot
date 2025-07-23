@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:jackpot/data/temp_requests.dart';
 import 'package:jackpot/domain/entities/championship_entity.dart';
 import 'package:jackpot/domain/entities/resume_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/team_entity.dart';
 import 'package:jackpot/domain/usecases/jackpot/fetch_all_team_jackpot_usecase.dart';
+import 'package:jackpot/domain/usecases/jackpot/group_by_championship_jackpot_usecase.dart';
 import 'package:jackpot/shared/utils/enums/home_tab.dart';
 import 'package:jackpot/shared/utils/enums/sports.dart';
 import 'package:jackpot/shared/utils/enums/sports_filters_type.dart';
 import 'package:jackpot/shared/utils/enums/tab_navigation_options.dart';
 
 class HomeController extends ChangeNotifier {
-  HomeController({required this.fetchAllTeamJackpotUsecase});
+  HomeController(
+      {required this.fetchAllTeamJackpotUsecase,
+      required this.groupByChampionshipJackpotUsecase});
 
+  final GroupByChampionshipJackpotUsecase groupByChampionshipJackpotUsecase;
   final FetchAllTeamJackpotUsecase fetchAllTeamJackpotUsecase;
   bool isLoading = false;
 
@@ -104,10 +107,11 @@ class HomeController extends ChangeNotifier {
   }
 
   Future<void> fetchAllJacks([needLoading = true]) async {
+    //TODO: CORRIGIR IMPLEMENTAÇÂO
     try {
       if (needLoading) setLoading();
-      final tempJacks = await TempRequests.fetchAllJacks();
-      _extraJacks = tempJacks;
+      // final tempJacks = await TempRequests.fetchAllJacks();
+      // _extraJacks = tempJacks;
       if (needLoading) setLoading();
     } catch (e) {
       if (needLoading) setLoading();
@@ -132,8 +136,18 @@ class HomeController extends ChangeNotifier {
   Future<void> fetchAllChampionships([needLoading = true]) async {
     if (needLoading) setLoading();
     try {
-      final tempChampionships = await TempRequests.fetchAllChampionships();
-      _championships = tempChampionships as List<ChampionshipEntity>;
+      final response = await groupByChampionshipJackpotUsecase();
+      response.fold(
+        (l) {
+          _exception = l.message;
+          notifyListeners();
+        },
+        (newChampionships) {
+          _championships = newChampionships;
+          notifyListeners();
+        },
+      );
+
       fetchAllFavoriteChampionships(_championships.length);
       if (needLoading) setLoading();
     } catch (e) {

@@ -77,6 +77,9 @@ class ChampionshipJackCard extends StatelessWidget {
                             Image.network(
                               homeTeam.logo,
                               height: 40,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Image.memory(base64Decode(homeTeam.logo),
+                                      height: 40),
                             ),
                             SizedBox(
                               width: Responsive.getHeightValue(5),
@@ -92,6 +95,9 @@ class ChampionshipJackCard extends StatelessWidget {
                             Image.network(
                               visitTeam.logo,
                               height: 40,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Image.memory(base64Decode(visitTeam.logo),
+                                      height: 40),
                             ),
                             const Spacer(),
                             Text(JackDateFormat.eventTimeFormat(date),

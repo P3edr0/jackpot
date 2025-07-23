@@ -128,7 +128,6 @@ class _CreateUserStepOnePageState extends State<CreateUserStepOnePage> {
                                   hint: 'CPF',
                                   onChanged: (value) async {
                                     controller.setDocumentMask();
-                                    // TODO: INSERIR EM PRODUÇÂO
                                     if (value.length == 14) {
                                       await controller.checkDocument();
                                       if (controller.hasError) {

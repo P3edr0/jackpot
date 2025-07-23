@@ -5,6 +5,7 @@ import 'package:jackpot/shared/utils/enums/question_structure_type.dart';
 class DoubleSubjectiveQuestionEntity extends QuestionStructureEntity {
   DoubleSubjectiveQuestionEntity({
     super.questionStructureType = QuestionStructureType.doubleSubjective,
+    required super.id,
     required this.firstController,
     required this.secondController,
   });

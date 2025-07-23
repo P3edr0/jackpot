@@ -1,36 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:jackpot/domain/entities/bet_question_review_entity.dart';
 import 'package:jackpot/domain/entities/double_subjective_question.dart';
 import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/domain/entities/objective_question_entity.dart';
-import 'package:jackpot/domain/entities/question_structure_entity.dart';
+import 'package:jackpot/domain/entities/question_group_entity.dart';
+import 'package:jackpot/domain/entities/shopping_cart_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/single_subjective_question.dart';
 
 class JackpotQuestionsController extends ChangeNotifier {
   //////////////////////// VARS //////////////////////////////
   bool _isQuestionsPreview = false;
-
-  List<QuestionStructureEntity> _questionsStructure = [];
-  List<List<QuestionStructureEntity>> _questionsStructurePages = [];
+  bool _isLoading = false;
+  List<JackpotAggregateEntity> _betQueue = [];
+  QuestionGroupEntity _questionsStructure = QuestionGroupEntity(questions: []);
+  List<QuestionGroupEntity> _questionsStructurePages = [];
   JackpotEntity? _selectedJackpot;
   int? _couponsQuantity;
   int _currentQuestionPage = 1;
   int _completedQuestions = 0;
-  JackpotQuestionsController();
   bool _acceptTerms = false;
   bool _isLastPage = false;
   bool _validQuestionFields = false;
-  List<QuestionStructureEntity> _previewQuestionStructure = [];
+  QuestionGroupEntity _previewQuestionStructure =
+      QuestionGroupEntity(questions: []);
   //////////////////////// GETS //////////////////////////////
   JackpotEntity? get selectedJackpot => _selectedJackpot;
   int? get couponsQuantity => _couponsQuantity;
   int get currentQuestionPage => _currentQuestionPage;
   int get remainQuestions => couponsQuantity! - _completedQuestions;
   int get completedQuestions => _completedQuestions;
-  List<QuestionStructureEntity> get questionsStructure => _questionsStructure;
-  List<List<QuestionStructureEntity>> get questionsStructurePages =>
+  QuestionGroupEntity get questionsStructure => _questionsStructure;
+  List<QuestionGroupEntity> get questionsStructurePages =>
       _questionsStructurePages;
-  List<QuestionStructureEntity> get previewQuestionStructure =>
-      _previewQuestionStructure;
+  List<JackpotAggregateEntity> get betQueue => _betQueue;
+  bool get hasMultipleBets => _betQueue.length > 1;
+  bool get isLoading => _isLoading;
+  QuestionGroupEntity get previewQuestionStructure => _previewQuestionStructure;
+
   bool get acceptTerms => _acceptTerms;
   bool get isLastPage => _isLastPage;
   bool get validQuestionFields => _validQuestionFields;
@@ -46,15 +52,24 @@ class JackpotQuestionsController extends ChangeNotifier {
     _acceptTerms = false;
   }
 
-  setIsQuestionsPreview(bool value, JackpotEntity newJackpot,
-      [int coupons = 1]) {
+  setLoading() {
+    _isLoading = !_isLoading;
+    notifyListeners();
+  }
+
+  setIsQuestionsPreview(bool value, List<JackpotAggregateEntity> newJackpots,
+      [List<BetQuestionReviewEntity> betQuestions = const []]) {
     _isQuestionsPreview = value;
     if (_isQuestionsPreview) {
-      startJackpotStructure(newJackpot, coupons);
+      startJackpotStructure(
+        newJackpots,
+        betQuestions,
+        _isQuestionsPreview,
+      );
 
       _questionsStructure = _previewQuestionStructure;
     } else {
-      startJackpotStructure(newJackpot, coupons);
+      startJackpotStructure(newJackpots, betQuestions, _isQuestionsPreview);
 
       _questionsStructure = _questionsStructurePages.first;
     }
@@ -100,7 +115,7 @@ class JackpotQuestionsController extends ChangeNotifier {
   }
 
   void setSelectedOption(int questionIndex, int optionIndex) {
-    final newList = [..._questionsStructure];
+    final newList = [..._questionsStructure.questions];
     final objectiveQuestion = newList[questionIndex] as ObjectiveQuestionEntity;
     if (objectiveQuestion.selectedList[optionIndex]) return;
     for (int index = 0;
@@ -114,13 +129,13 @@ class JackpotQuestionsController extends ChangeNotifier {
     }
 
     newList[questionIndex] = objectiveQuestion;
-    _questionsStructure = [...newList];
+    _questionsStructure.questions = [...newList];
     checkCanSkipPage();
     notifyListeners();
   }
 
   void checkCanSkipPage() {
-    for (var question in _questionsStructure) {
+    for (var question in _questionsStructure.questions) {
       if (question.isComplete() == false) {
         _validQuestionFields = false;
         notifyListeners();
@@ -131,44 +146,87 @@ class JackpotQuestionsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void startJackpotStructure(JackpotEntity newJackpot, int newCouponsQuantity) {
-    if (newJackpot.id == _selectedJackpot?.id &&
-        _couponsQuantity == newCouponsQuantity) {
+  void startJackpotStructure(List<JackpotAggregateEntity> newJackpots,
+      List<BetQuestionReviewEntity> betAnswers,
+      [bool isPreview = false]) {
+    final currentJackpot = newJackpots.first;
+    if (currentJackpot.jackpot.id == _selectedJackpot?.id &&
+        currentJackpot.couponsQuantity == _couponsQuantity &&
+        !isPreview) {
       return;
     }
+
+    if (!isPreview) {
+      _betQueue = [...newJackpots];
+    }
     _currentQuestionPage = 1;
-    _selectedJackpot = newJackpot;
-    _couponsQuantity = newCouponsQuantity;
+    _selectedJackpot = newJackpots.first.jackpot;
+    _couponsQuantity = newJackpots.first.couponsQuantity;
     checkIsLastPage();
     _completedQuestions = 0;
     final questions = _selectedJackpot!.questions.items;
     _questionsStructurePages = [];
     for (var i = 0; i <= couponsQuantity!; i++) {
-      final List<QuestionStructureEntity> tempQuestionsStructure = [];
+      final QuestionGroupEntity tempQuestionsStructure =
+          QuestionGroupEntity(questions: []);
 
       for (var question in questions) {
         if (question.questionType.isObjective) {
           final int listLength = question.objOptions.length;
-          final initialList = List.generate(listLength, (index) => false);
+          List<bool> initialList = [];
+          if (betAnswers.isNotEmpty) {
+            final answer =
+                betAnswers.firstWhere((element) => element.id == question.id);
+            for (var option in question.objOptions) {
+              if (answer.answer == option) {
+                initialList.add(true);
+              } else {
+                initialList.add(false);
+              }
+            }
+          } else {
+            initialList = List.generate(listLength, (index) => false);
+          }
+
           final objectiveQuestionStructure = ObjectiveQuestionEntity(
+            id: question.id,
             options: question.objOptions,
             selectedList: initialList,
           );
 
-          tempQuestionsStructure.add(objectiveQuestionStructure);
+          tempQuestionsStructure.questions.add(objectiveQuestionStructure);
         } else {
           if (question.questionQuantity.isSingle) {
+            String answer = '';
+            if (betAnswers.isNotEmpty) {
+              final handledAnswer =
+                  betAnswers.firstWhere((element) => element.id == question.id);
+              answer = handledAnswer.answer;
+            }
+
             final singleSubjectiveQuestionStructure =
                 SingleSubjectiveQuestionEntity(
-                    controller: TextEditingController());
-            tempQuestionsStructure.add(singleSubjectiveQuestionStructure);
+                    id: question.id,
+                    controller: TextEditingController(text: answer));
+            tempQuestionsStructure.questions
+                .add(singleSubjectiveQuestionStructure);
           } else {
+            String answer = '';
+            String answerTwo = '';
+            if (betAnswers.isNotEmpty) {
+              final handledAnswer =
+                  betAnswers.firstWhere((element) => element.id == question.id);
+              answer = handledAnswer.answer;
+              answerTwo = handledAnswer.answerTwo;
+            }
             final doubleSubjectiveQuestionStructure =
                 DoubleSubjectiveQuestionEntity(
-              firstController: TextEditingController(),
-              secondController: TextEditingController(),
+              id: question.id,
+              firstController: TextEditingController(text: answer),
+              secondController: TextEditingController(text: answerTwo),
             );
-            tempQuestionsStructure.add(doubleSubjectiveQuestionStructure);
+            tempQuestionsStructure.questions
+                .add(doubleSubjectiveQuestionStructure);
           }
         }
       }

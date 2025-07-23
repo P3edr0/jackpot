@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:jackpot/components/appbar/appbar.dart';
+import 'package:jackpot/components/appbar/appbar_secondary.dart';
 import 'package:jackpot/components/buttons/selectable_rounded_button.dart';
 import 'package:jackpot/components/cards/banner_card.dart';
 import 'package:jackpot/components/cards/championship_jack_card.dart';
 import 'package:jackpot/components/loadings/loading.dart';
+import 'package:jackpot/components/shopping_cart_item.dart';
 import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_bar.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_team/store/jackpot_team_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/store/jackpot_controller.dart';
+import 'package:jackpot/presenter/features/shopping_cart/store/shopping_cart_controller.dart';
+import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
 import 'package:jackpot/shared/utils/enums/jack_filters_type.dart';
 import 'package:jackpot/shared/utils/routes/app_routes.dart';
@@ -117,6 +120,17 @@ class _JackpotTeamPageState extends State<JackpotTeamPage> {
                                                         .teamCompleteJackpots,
                                                 builder:
                                                     (context, jackpots, child) {
+                                                  if (jackpots.isEmpty) {
+                                                    return Center(
+                                                      heightFactor: 8,
+                                                      child: Text('Lista Vazia',
+                                                          style: JackFontStyle
+                                                              .title
+                                                              .copyWith(
+                                                                  color:
+                                                                      darkBlue)),
+                                                    );
+                                                  }
                                                   return Column(
                                                     children: jackpots
                                                         .map((jack) => Padding(
@@ -135,7 +149,7 @@ class _JackpotTeamPageState extends State<JackpotTeamPage> {
                                                                             false);
                                                                 jackController
                                                                     .setSelectedJackpot(
-                                                                        jack);
+                                                                        [jack]);
                                                                 Navigator.pushNamed(
                                                                     context,
                                                                     AppRoutes
@@ -170,8 +184,7 @@ class _JackpotTeamPageState extends State<JackpotTeamPage> {
                                           alignment: Alignment.topCenter,
                                           padding: EdgeInsets.symmetric(
                                               horizontal:
-                                                  Responsive.getHeightValue(
-                                                      16)),
+                                                  Responsive.getHeightValue(3)),
                                           decoration: const BoxDecoration(
                                               gradient: secondaryGradient,
                                               borderRadius: BorderRadius.only(
@@ -182,15 +195,44 @@ class _JackpotTeamPageState extends State<JackpotTeamPage> {
                                           width: constraints.maxWidth,
                                           height:
                                               Responsive.getHeightValue(180),
-                                          child: Selector<JackpotTeamController,
-                                              String>(
-                                            selector: (context, controller) =>
-                                                controller.selectedTeamName,
-                                            builder: (context, label, child) =>
-                                                JackAppBar.transparent(
-                                              title: label,
+                                          child: Consumer2<
+                                              JackpotTeamController,
+                                              ShoppingCartController>(
+                                            builder: (context,
+                                                    jackpotTeamController,
+                                                    shoppingCartController,
+                                                    child) =>
+                                                JackAppBarSecondary(
+                                              isTransparent: true,
                                               alignment:
                                                   MainAxisAlignment.start,
+                                              child: Expanded(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      jackpotTeamController
+                                                          .selectedTeamName,
+                                                      style: JackFontStyle.title
+                                                          .copyWith(
+                                                              color:
+                                                                  secondaryColor),
+                                                    ),
+                                                    JackCartIcon(
+                                                      itemCount:
+                                                          shoppingCartController
+                                                              .totalCoupons,
+                                                      onTap: () async =>
+                                                          Navigator.pushNamed(
+                                                              context,
+                                                              AppRoutes
+                                                                  .shoppingCart),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),

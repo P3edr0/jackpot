@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dartz/dartz.dart';
 import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/domain/entities/resume_championship_entity.dart';
@@ -51,9 +53,48 @@ class GetJackpotUsecase {
       TeamEntity? homeTeam;
       TeamEntity? visitorTeam;
       ResumeChampionshipEntity? championship;
-      homeTeam = handledAllTeams.firstWhere((team) => team.id == homeTeamId);
-      visitorTeam =
-          handledAllTeams.firstWhere((team) => team.id == visitorTeamId);
+      try {
+        homeTeam = handledAllTeams.firstWhere(
+          (team) => team.id == homeTeamId,
+        );
+        visitorTeam =
+            handledAllTeams.firstWhere((team) => team.id == visitorTeamId);
+      } catch (_, stack) {
+        if (homeTeam == null) {
+          final response = await teamRepository(homeTeamId);
+          response.fold((exception) {}, (team) {
+            homeTeam = TeamEntity(
+                jackpotId: '',
+                potValue: '',
+                title: team.name,
+                banner: team.banner,
+                isFavorite: false,
+                logo: team.logo,
+                name: team.name,
+                id: team.id);
+          });
+        }
+        if (visitorTeam == null) {
+          final response = await teamRepository(visitorTeamId);
+          response.fold((exception) {}, (team) {
+            visitorTeam = TeamEntity(
+                jackpotId: '',
+                potValue: '',
+                title: team.name,
+                banner: team.banner,
+                isFavorite: false,
+                logo: team.logo,
+                name: team.name,
+                id: team.id);
+          });
+        }
+        if (visitorTeam == null || homeTeam == null) {
+          log(stack.toString());
+
+          return Left(BadRequestJackException(
+              message: 'Falha ao buscar dados dos times.'));
+        }
+      }
 
       var championshipResponse = responses[1];
       championshipResponse.fold((championshipError) {
@@ -65,12 +106,12 @@ class GetJackpotUsecase {
       if (exception != null) {
         return Left(exception!);
       }
-      jackpot.homeTeam = homeTeam;
-      jackpot.visitorTeam = visitorTeam;
-      if (homeTeam.id == jackpot.jackpotOwnerTeam.id) {
-        jackpot.jackpotOwnerTeam = homeTeam;
+      jackpot.homeTeam = homeTeam!;
+      jackpot.visitorTeam = visitorTeam!;
+      if (homeTeam!.id == jackpot.jackpotOwnerTeam.id) {
+        jackpot.jackpotOwnerTeam = homeTeam!;
       } else {
-        jackpot.jackpotOwnerTeam = visitorTeam;
+        jackpot.jackpotOwnerTeam = visitorTeam!;
       }
 
       final championshipTeamIds =

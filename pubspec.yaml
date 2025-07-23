@@ -30,9 +30,11 @@ dependencies:
   localization: ^2.1.1
   lottie: ^3.2.0
   mask_text_input_formatter: ^2.9.0
+  pagseguro_card_encrypt: ^1.0.0
   path_provider: ^2.1.5
   permission_handler: ^12.0.0+1
   provider: ^6.1.4
+  shared_preferences: ^2.5.3
   syncfusion_flutter_pdfviewer: ^29.1.40
   tuple: ^2.0.2
 

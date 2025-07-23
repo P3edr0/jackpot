@@ -5,6 +5,7 @@ import 'package:jackpot/domain/entities/team_entity.dart';
 class JackpotEntity {
   JackpotEntity({
     required this.id,
+    required this.betId,
     required this.championship,
     required this.banner,
     required this.potValue,
@@ -21,6 +22,7 @@ class JackpotEntity {
   });
   ResumeChampionshipEntity championship;
   String id;
+  String betId;
   String banner;
   String potValue;
   DateTime endAt;

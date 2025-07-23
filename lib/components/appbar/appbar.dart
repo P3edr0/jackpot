@@ -8,17 +8,30 @@ class JackAppBar extends StatelessWidget {
   const JackAppBar({
     super.key,
     required this.title,
+    this.titleColor = darkBlue,
     this.alignment = MainAxisAlignment.spaceBetween,
-  }) : isTransparent = false;
+    this.isTransparent = false,
+  }) : child = null;
   const JackAppBar.transparent({
     super.key,
+    this.titleColor = darkBlue,
     required this.title,
     this.alignment = MainAxisAlignment.start,
-  }) : isTransparent = true;
+  })  : isTransparent = true,
+        child = null;
+  const JackAppBar.widget(
+      {super.key,
+      this.alignment = MainAxisAlignment.start,
+      required this.child})
+      : isTransparent = false,
+        title = null,
+        titleColor = null;
 
   final String? title;
   final MainAxisAlignment alignment;
   final bool isTransparent;
+  final Widget? child;
+  final Color? titleColor;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +60,7 @@ class JackAppBar extends StatelessWidget {
             if (hasTitle)
               Text(
                 title!,
-                style: JackFontStyle.title.copyWith(color: secondaryColor),
+                style: JackFontStyle.title.copyWith(color: titleColor),
               ),
           ],
         ),
@@ -77,6 +90,7 @@ class JackAppBar extends StatelessWidget {
                   color: secondaryColor,
                 )),
           ),
+          if (child != null) child!,
           if (hasTitle)
             Text(
               title!,

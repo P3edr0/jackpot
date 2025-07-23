@@ -13,15 +13,6 @@ class DeleteUserDatasourceImpl implements IDeleteUserDatasource {
 
   @override
   Future<Either<IJackExceptions, bool>> call(String userId) async {
-    // final dio = Dio(BaseOptions(
-    //   baseUrl: JackEnvironment.apiUzerpass,
-    //   headers: {
-    //     'Accept': 'application/json',
-    //     "Authorization": tokenGenerator.bearerToken!.generate(),
-    //   },
-    // ))
-    //   ..interceptors.add(CurlLoggerDioInterceptor(printOnSuccess: true));
-
     if (tokenGenerator.bearerToken == null) {
       await tokenGenerator();
     }
@@ -51,7 +42,3 @@ class DeleteUserDatasourceImpl implements IDeleteUserDatasource {
     }
   }
 }
-
-
-// curl --location --request DELETE 'https://uzerticket.com.br/rest/v1/usuarios/351206' \
-// --header 'Authorization: Bearer 2be338b9dda70ed3c4ff7ddb8aa87c2d' \

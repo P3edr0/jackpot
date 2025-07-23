@@ -21,7 +21,6 @@ class PhoneInputFormatter extends TextInputFormatter {
     } else if (text.length <= 4) {
       newText = '+${text.substring(0, 2)} (${text.substring(2)}';
     } else if (text.length <= 8) {
-      // Preenchendo até o DDD + início do número (4 digitos)
       newText =
           '+${text.substring(0, 2)} (${text.substring(2, 4)}) ${text.substring(4)}';
     } else if (text.length <= 12) {
@@ -37,7 +36,6 @@ class PhoneInputFormatter extends TextInputFormatter {
             '${numberPart.substring(0, 5)}-${numberPart.substring(5)}';
       }
     } else {
-      // No máximo 13 dígitos no total (DDI + DDD + 9 números)
       newText = '+${text.substring(0, 2)} (${text.substring(2, 4)}) '
           '${text.substring(4, 9)}-${text.substring(9, 13)}';
     }
