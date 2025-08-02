@@ -7,10 +7,12 @@ import 'package:jackpot/components/dialogs/info_dialog.dart';
 import 'package:jackpot/components/loadings/loading.dart';
 import 'package:jackpot/components/loadings/loading_content.dart';
 import 'package:jackpot/domain/entities/pix_entity.dart';
+import 'package:jackpot/presenter/features/jackpot/store/jackpot_controller.dart';
 import 'package:jackpot/presenter/features/payment/pages/pix_page/store/pix_controller.dart';
 import 'package:jackpot/presenter/features/payment/pages/store/payment_controller.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
+import 'package:jackpot/shared/utils/formatters/date_formatter.dart';
 import 'package:jackpot/shared/utils/formatters/money_formatters.dart';
 import 'package:jackpot/shared/utils/routes/app_routes.dart';
 import 'package:jackpot/theme/colors.dart';
@@ -26,12 +28,14 @@ class PixPage extends StatefulWidget {
 class _PixPageState extends State<PixPage> {
   late PaymentController paymentController;
   late PixController pixController;
+  late JackpotController jackpotController;
 
   @override
   void initState() {
     super.initState();
     paymentController = Provider.of<PaymentController>(context, listen: false);
     pixController = Provider.of<PixController>(context, listen: false);
+    jackpotController = Provider.of<JackpotController>(context, listen: false);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       pixController.addListener(successRedirect);
@@ -51,6 +55,9 @@ class _PixPageState extends State<PixPage> {
               'Erro',
               "Falha ao gerar Qr code.\n Por favor tente novamente mais tarde. ",
               context);
+        } else {
+          final userDocument = paymentController.userDocument;
+          jackpotController.startTemporaryBets(pix, userDocument);
         }
         pixController.setLoading(false);
       }
@@ -62,11 +69,19 @@ class _PixPageState extends State<PixPage> {
 
   void successRedirect() {
     if (pixController.pixStatus?.isSuccess ?? false) {
-      pixController.cancelTimer();
+      pixController.cancelTimers();
 
       Navigator.pushNamed(context, AppRoutes.jackpotQuestions);
       pixController.removeListener(successRedirect);
     }
+  }
+
+  @override
+  void dispose() {
+    pixController.cancelTimers();
+
+    pixController.removeListener(successRedirect);
+    super.dispose();
   }
 
   @override
@@ -128,6 +143,16 @@ class _PixPageState extends State<PixPage> {
                                                           .getLabelColor()),
                                             ),
                                           ),
+                                          SizedBox(
+                                              height: Responsive.getHeightValue(
+                                                  10)),
+                                          if (controller.pixStatus!.isWaiting)
+                                            Text(
+                                              JackDateFormat.expireTimeFormat(
+                                                  controller.pix!.expireAt),
+                                              style: JackFontStyle.bodyLargeBold
+                                                  .copyWith(color: alertColor),
+                                            ),
                                           SizedBox(
                                               height: Responsive.getHeightValue(
                                                   16)),
@@ -207,6 +232,11 @@ class _PixPageState extends State<PixPage> {
                                             borderColor: darkBlue,
                                             borderWidth: 2,
                                             onTap: () async {
+                                              pixController.cancelTimers();
+                                              Navigator.pushNamed(context,
+                                                  AppRoutes.jackpotQuestions);
+
+                                              return;
                                               Clipboard.setData(ClipboardData(
                                                   text: controller
                                                       .pix!.copyPaste));
@@ -251,7 +281,7 @@ class _PixPageState extends State<PixPage> {
                                               borderColor: darkBlue,
                                               borderWidth: 2,
                                               onTap: () {
-                                                pixController.cancelTimer();
+                                                pixController.cancelTimers();
                                                 Navigator.pushNamed(context,
                                                     AppRoutes.jackpotQuestions);
                                               },

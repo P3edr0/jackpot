@@ -8,8 +8,9 @@ import 'package:jackpot/components/cards/buy_resume_card.dart';
 import 'package:jackpot/components/cards/match_card.dart';
 import 'package:jackpot/components/shopping_cart_item.dart';
 import 'package:jackpot/core/store/core_controller.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/domain/entities/shopping_cart_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/temporary_bet_entity.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_bar.dart';
 import 'package:jackpot/presenter/features/jackpot/coupon_select/store/coupon_select_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_questions/store/jackpot_questions_controller.dart';
@@ -19,6 +20,7 @@ import 'package:jackpot/presenter/features/payment/pages/store/payment_controlle
 import 'package:jackpot/presenter/features/shopping_cart/store/shopping_cart_controller.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
+import 'package:jackpot/shared/utils/app_assets.dart';
 import 'package:jackpot/shared/utils/enums/coupons_base_quantity.dart';
 import 'package:jackpot/shared/utils/formatters/money_formatters.dart';
 import 'package:jackpot/shared/utils/routes/app_routes.dart';
@@ -131,6 +133,12 @@ class _CouponSelectPageState extends State<CouponSelectPage>
                     bytes,
                     width: 80,
                     height: 80,
+                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                      width: 80,
+                      height: 80,
+                      AppAssets.splash,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
@@ -182,9 +190,9 @@ class _CouponSelectPageState extends State<CouponSelectPage>
                           SizedBox(
                             height: Responsive.getHeightValue(16),
                           ),
-                          Selector<JackpotController, JackpotEntity>(
-                              selector: (context, controller) =>
-                                  controller.selectedJackpot!.first,
+                          Selector<JackpotController, SportJackpotEntity>(
+                              selector: (context, controller) => controller
+                                  .selectedJackpot!.first as SportJackpotEntity,
                               builder: (context, jackpot, child) {
                                 return MatchCard(
                                   constraints: constraints,
@@ -192,7 +200,7 @@ class _CouponSelectPageState extends State<CouponSelectPage>
                                   homeTeam: jackpot.homeTeam,
                                   visitTeam: jackpot.visitorTeam,
                                   onTap: () {},
-                                  potValue: jackpot.potValue,
+                                  potValue: jackpot.potValue!,
                                   title: jackpot.championship.name,
                                 );
                               }),
@@ -216,7 +224,8 @@ class _CouponSelectPageState extends State<CouponSelectPage>
                                             couponsQuantity: 1,
                                             jackpot: jackpot!.first);
                                     questionsController.setIsQuestionsPreview(
-                                        true, [handledJackpot]);
+                                        newIsQuestionPreview: true,
+                                        newJackpots: [handledJackpot]);
                                     Navigator.pushNamed(
                                         context, AppRoutes.jackpotQuestions);
                                   },
@@ -522,10 +531,25 @@ class _CouponSelectPageState extends State<CouponSelectPage>
                                         Provider.of<PaymentController>(context,
                                             listen: false);
 
-                                    final jackpot =
-                                        jackController.selectedJackpot;
+                                    final jackpot = jackController
+                                        .selectedJackpot!
+                                        .map((jack) {
+                                      if (jack is SportJackpotEntity) {
+                                        return jack;
+                                      } else {
+                                        return null;
+                                      }
+                                    }).toList();
+
+                                    final newTemporaryBet = TemporaryBetEntity(
+                                        couponQuantity: couponsQuantity,
+                                        jackpotId: jackpot.first!.id,
+                                        couponPrice: controller.couponPrice);
+
                                     jackController
-                                        .setSelectedJackpot([jackpot!.first]);
+                                        .setTemporaryBets([newTemporaryBet]);
+                                    jackController
+                                        .setSelectedJackpot([jackpot.first!]);
                                     paymentController.setPaymentData(
                                         newCouponsQuantity: couponsQuantity,
                                         newTotalValue: totalValue,
@@ -533,16 +557,18 @@ class _CouponSelectPageState extends State<CouponSelectPage>
                                         newPaymentCouponsQuantity:
                                             couponsQuantity,
                                         newItemPaymentDescription:
-                                            "JACKPOT ${jackpot.first.jackpotOwnerTeam.name} - ID ${jackpot.first.id}",
+                                            "JACKPOT ${jackpot.first!.jackpotOwnerTeam.name} - ID ${jackpot.first!.id}",
                                         newItemDescription:
-                                            "JACKPOT ${jackpot.first.jackpotOwnerTeam.name}");
+                                            "JACKPOT ${jackpot.first!.jackpotOwnerTeam.name}");
+
                                     final handledJackpot =
                                         JackpotAggregateEntity(
                                             couponPrice: 00,
                                             couponsQuantity: couponsQuantity,
-                                            jackpot: jackpot.first);
+                                            jackpot: jackpot.first!);
                                     questionsController.setIsQuestionsPreview(
-                                        false, [handledJackpot]);
+                                        newIsQuestionPreview: false,
+                                        newJackpots: [handledJackpot]);
                                     Navigator.pushNamed(
                                         context, AppRoutes.payment);
                                   },

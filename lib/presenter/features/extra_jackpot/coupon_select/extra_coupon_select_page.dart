@@ -8,10 +8,6 @@ import 'package:jackpot/components/cards/buy_resume_card.dart';
 import 'package:jackpot/components/loadings/loading_content.dart';
 import 'package:jackpot/components/shopping_cart_item.dart';
 import 'package:jackpot/core/store/core_controller.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
-import 'package:jackpot/domain/entities/question_entity.dart';
-import 'package:jackpot/domain/entities/resume_championship_entity.dart';
-import 'package:jackpot/domain/entities/team_entity.dart';
 import 'package:jackpot/presenter/features/extra_jackpot/coupon_select/store/extra_coupon_select_controller.dart';
 import 'package:jackpot/presenter/features/extra_jackpot/extra_jackpot_controller.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_bar.dart';
@@ -77,8 +73,8 @@ class _ExtraCouponSelectPageState extends State<ExtraCouponSelectPage>
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final stringCouponPrice =
-          extraJackController.selectedJackpot?.first.budgetValue;
-      const handledCouponPrice = 1.99; // double.parse(stringCouponPrice);
+          extraJackController.selectedJackpot?.first.potValue;
+      final handledCouponPrice = double.parse(stringCouponPrice!);
       controller.setCouponPrice(handledCouponPrice);
       setState(() {
         couponPrice = handledCouponPrice;
@@ -133,6 +129,12 @@ class _ExtraCouponSelectPageState extends State<ExtraCouponSelectPage>
                     bytes,
                     width: 80,
                     height: 80,
+                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                      width: 80,
+                      height: 80,
+                      AppAssets.splash,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
@@ -216,7 +218,9 @@ class _ExtraCouponSelectPageState extends State<ExtraCouponSelectPage>
                                                 errorBuilder: (context, error,
                                                         stackTrace) =>
                                                     Image.asset(
-                                                        AppAssets.splash)),
+                                                      AppAssets.splash,
+                                                      fit: BoxFit.cover,
+                                                    )),
                                           ),
                                         ],
                                       ),
@@ -506,35 +510,35 @@ class _ExtraCouponSelectPageState extends State<ExtraCouponSelectPage>
                                     // paymentController.setPaymentData(
                                     //     newCouponsQuantity: couponsQuantity,
                                     //     newTotalValue: totalValue);
-                                    final jackpot =
-                                        extraJackController.selectedJackpot;
-                                    final mockJackpot = JackpotEntity(
-                                        id: extraJackController
-                                            .selectedJackpotId,
-                                        betId: extraJackController
-                                            .selectedJackpotId,
-                                        championship:
-                                            ResumeChampionshipEntity.empty(''),
-                                        banner: extraJackController
-                                            .selectedJackpotImage,
-                                        potValue: '10000',
-                                        endAt: DateTime.now(),
-                                        matchTime: DateTime.now(),
-                                        budgetValue: '11500',
-                                        awardsId: [],
-                                        description: 'Vazio',
-                                        questionId: '',
-                                        homeTeam: TeamEntity.empty('0'),
-                                        visitorTeam: TeamEntity.empty('0'),
-                                        jackpotOwnerTeam: TeamEntity.empty('0'),
-                                        questions: QuestionEntity(
-                                            id: '',
-                                            title: '',
-                                            category: '',
-                                            createAt: null,
-                                            items: []));
-                                    extraJackController
-                                        .setSelectedJackpot([mockJackpot]);
+                                    // final jackpot =
+                                    //     extraJackController.selectedJackpot;
+                                    // final mockJackpot = JackpotEntity(
+                                    //     id: extraJackController
+                                    //         .selectedJackpotId,
+                                    //     betId: extraJackController
+                                    //         .selectedJackpotId,
+                                    //     championship:
+                                    //         ResumeChampionshipEntity.empty(''),
+                                    //     banner: extraJackController
+                                    //         .selectedJackpotImage,
+                                    //     potValue: '10000',
+                                    //     endAt: DateTime.now(),
+                                    //     matchTime: DateTime.now(),
+                                    //     budgetValue: '11500',
+                                    //     awardsId: [],
+                                    //     description: 'Vazio',
+                                    //     questionId: '',
+                                    //     homeTeam: TeamEntity.empty('0'),
+                                    //     visitorTeam: TeamEntity.empty('0'),
+                                    //     jackpotOwnerTeam: TeamEntity.empty('0'),
+                                    //     questions: QuestionEntity(
+                                    //         id: '',
+                                    //         title: '',
+                                    //         category: '',
+                                    //         createAt: null,
+                                    //         items: []));
+                                    // extraJackController
+                                    //     .setSelectedJackpot([mockJackpot]);
 
                                     Navigator.pushNamed(
                                         context, AppRoutes.payment);

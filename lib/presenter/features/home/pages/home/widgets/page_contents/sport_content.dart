@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:jackpot/components/buttons/selectable_rounded_button.dart';
 import 'package:jackpot/components/cards/jack_card.dart';
 import 'package:jackpot/domain/entities/championship_entity.dart';
@@ -10,6 +11,7 @@ import 'package:jackpot/presenter/features/jackpot/jackpot_championship/store/ja
 import 'package:jackpot/presenter/features/jackpot/jackpot_team/store/jackpot_team_controller.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
+import 'package:jackpot/shared/utils/app_assets.dart';
 import 'package:jackpot/shared/utils/routes/app_routes.dart';
 import 'package:jackpot/theme/colors.dart';
 import 'package:provider/provider.dart';
@@ -81,11 +83,29 @@ class SportContent extends StatelessWidget {
                   ? Selector<HomeController, List<ResumeJackpotEntity>>(
                       selector: (_, control) => control.sportJacks,
                       builder: (_, jacks, __) {
+                        if (jacks.isEmpty) {
+                          return Center(
+                            child: Column(children: [
+                              SizedBox(
+                                height: Responsive.getHeightValue(50),
+                              ),
+                              SvgPicture.asset(
+                                  height: Responsive.getHeightValue(40),
+                                  AppAssets.bagSvg),
+                              SizedBox(height: Responsive.getHeightValue(6)),
+                              Text('Vazio',
+                                  textAlign: TextAlign.center,
+                                  style: JackFontStyle.titleBold
+                                      .copyWith(color: mediumGrey)),
+                            ]),
+                          );
+                        }
                         return ListView.separated(
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
                               final jack = jacks[index];
+
                               return JackCard(
                                 onTap: () {
                                   if (jack.jackpotType!.isChampionship) {

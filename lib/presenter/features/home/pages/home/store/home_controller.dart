@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jackpot/domain/entities/championship_entity.dart';
+import 'package:jackpot/domain/entities/extra_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/resume_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/team_entity.dart';
 import 'package:jackpot/domain/usecases/jackpot/fetch_all_team_jackpot_usecase.dart';
+import 'package:jackpot/domain/usecases/jackpot/fetch_extra_jackpot_usecase.dart';
 import 'package:jackpot/domain/usecases/jackpot/group_by_championship_jackpot_usecase.dart';
 import 'package:jackpot/shared/utils/enums/home_tab.dart';
 import 'package:jackpot/shared/utils/enums/sports.dart';
@@ -10,15 +12,18 @@ import 'package:jackpot/shared/utils/enums/sports_filters_type.dart';
 import 'package:jackpot/shared/utils/enums/tab_navigation_options.dart';
 
 class HomeController extends ChangeNotifier {
-  HomeController(
-      {required this.fetchAllTeamJackpotUsecase,
-      required this.groupByChampionshipJackpotUsecase});
+  HomeController({
+    required this.fetchAllTeamJackpotUsecase,
+    required this.groupByChampionshipJackpotUsecase,
+    required this.fetchExtraJackpotUsecase,
+  });
 
   final GroupByChampionshipJackpotUsecase groupByChampionshipJackpotUsecase;
   final FetchAllTeamJackpotUsecase fetchAllTeamJackpotUsecase;
+  final FetchExtraJackpotUsecase fetchExtraJackpotUsecase;
   bool isLoading = false;
 
-  List<ResumeJackpotEntity> _extraJacks = [];
+  List<ExtraJackpotEntity> _extraJacks = [];
   List<ResumeJackpotEntity> _sportJacks = [];
   List<ChampionshipEntity> _championships = [];
   List<TeamEntity> _teams = [];
@@ -49,7 +54,7 @@ class HomeController extends ChangeNotifier {
   List<bool> get favoriteChampionships => _favoriteChampionships;
   HomeTab get selectedTab => _selectedTab;
   SportsOptions get selectedSport => _selectedSport;
-  List<ResumeJackpotEntity> get extraJacks => _extraJacks;
+  List<ExtraJackpotEntity> get extraJacks => _extraJacks;
   List<ResumeJackpotEntity> get sportJacks => _sportJacks;
   List<TeamEntity> get teams => _teams;
   List<ChampionshipEntity> get championships => _championships;
@@ -64,6 +69,7 @@ class HomeController extends ChangeNotifier {
     await Future.wait([
       fetchAllJacks(false),
       fetchAllTeams(false),
+      fetchExtraJackpots(false),
       fetchAllChampionships(false),
     ]);
     setLoading();
@@ -90,12 +96,11 @@ class HomeController extends ChangeNotifier {
   }
 
   setFavoriteExtraJacks(int index) {
-    final newStatus = !extraJacks[index].isFavorite;
-    List<ResumeJackpotEntity> tempList = [...extraJacks];
+    // final newStatus = !extraJacks[index].isFavorite;
+    // List<ResumeJackpotEntity> tempList = [...extraJacks];
 
-    tempList[index].isFavorite = newStatus;
-    _extraJacks.clear();
-    _extraJacks = [...tempList];
+    // tempList[index].isFavorite = newStatus;
+    // _extraJacks.clear();
     notifyListeners();
   }
 
@@ -144,6 +149,28 @@ class HomeController extends ChangeNotifier {
         },
         (newChampionships) {
           _championships = newChampionships;
+          notifyListeners();
+        },
+      );
+
+      fetchAllFavoriteChampionships(_championships.length);
+      if (needLoading) setLoading();
+    } catch (e) {
+      if (needLoading) setLoading();
+    }
+  }
+
+  Future<void> fetchExtraJackpots([needLoading = true]) async {
+    if (needLoading) setLoading();
+    try {
+      final response = await fetchExtraJackpotUsecase();
+      response.fold(
+        (l) {
+          _exception = l.message;
+          notifyListeners();
+        },
+        (newExtra) {
+          _extraJacks = newExtra;
           notifyListeners();
         },
       );

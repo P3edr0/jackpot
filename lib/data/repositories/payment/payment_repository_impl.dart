@@ -7,6 +7,7 @@ import 'package:jackpot/domain/entities/payment_order_entity.dart';
 import 'package:jackpot/domain/entities/pix_entity.dart';
 import 'package:jackpot/domain/exceptions/auth_exceptions.dart';
 import 'package:jackpot/domain/repositories/payment/payment_repository.dart';
+import 'package:jackpot/shared/utils/enums/payment_status.dart';
 
 class GetPixRepositoryImpl implements IGetPixRepository {
   GetPixRepositoryImpl({required this.datasource});
@@ -36,7 +37,7 @@ class GetPixStatusRepositoryImpl implements IGetPixStatusRepository {
   IGetPixStatusDatasource datasource;
 
   @override
-  Future<Either<IJackExceptions, bool>> call(String id) async {
+  Future<Either<IJackExceptions, PaymentStatus>> call(String id) async {
     final response = await datasource(id);
     return response;
   }

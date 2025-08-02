@@ -11,7 +11,7 @@ class TeamEntity extends ResumeJackpotEntity {
       required this.logo,
       required this.name,
       required this.id,
-      super.jackpotType = JackpotType.team});
+      super.jackpotType = SportJackpotType.team});
 
   String name;
   String logo;

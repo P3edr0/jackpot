@@ -6,7 +6,7 @@ import 'package:jackpot/components/cards/match_card_carousel.dart';
 import 'package:jackpot/components/dialogs/error_dialog.dart';
 import 'package:jackpot/components/textfields/textfield.dart';
 import 'package:jackpot/core/store/core_controller.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_bar.dart';
 import 'package:jackpot/presenter/features/jackpot/quick_purchase/store/quick_purchase_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/store/jackpot_controller.dart';
@@ -75,9 +75,9 @@ class _QuickPurchasePageState extends State<QuickPurchasePage>
                       SizedBox(
                         height: Responsive.getHeightValue(16),
                       ),
-                      Selector<JackpotController, List<JackpotEntity>>(
-                          selector: (context, controller) =>
-                              controller.selectedJackpot!,
+                      Selector<JackpotController, List<SportJackpotEntity>>(
+                          selector: (context, controller) => controller
+                              .selectedJackpot! as List<SportJackpotEntity>,
                           builder: (context, jackpots, child) => Padding(
                                 padding: EdgeInsets.only(
                                     bottom: Responsive.getHeightValue(16)),

@@ -64,7 +64,7 @@ class _QuestionCardState extends State<QuestionCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              levelCard(widget.level, widget.constraints),
+              levelPrizeCard(widget.level, widget.constraints),
               LayoutBuilder(builder: (context, constraints) {
                 return Container(
                     width: constraints.maxWidth,
@@ -220,14 +220,61 @@ class _QuestionCardState extends State<QuestionCard> {
             ],
           ),
         ),
-        Positioned(
-            top: 0, right: 5, child: Image.asset(levelCrown(widget.level)))
+        Positioned(top: 0, right: 5, child: Image.asset(levelCrown(3)))
       ],
     );
   }
 }
 
-Widget levelCard(int level, BoxConstraints constraints) {
+Widget levelPrizeCard(int level, BoxConstraints constraints) {
+  switch (level) {
+    // case 1:
+    //   return Container(
+    //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    //     decoration: const BoxDecoration(
+    //         color: bronze,
+    //         borderRadius: BorderRadius.only(
+    //             topLeft: Radius.circular(16), topRight: Radius.circular(16))),
+    //     width: constraints.maxWidth,
+    //     child: Text(
+    //       'POTE BRONZE - Prêmio 20% do valor total',
+    //       style: JackFontStyle.body
+    //           .copyWith(color: secondaryColor, fontWeight: FontWeight.w900),
+    //     ),
+    //   );
+    // case 2:
+    //   return Container(
+    //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    //     decoration: const BoxDecoration(
+    //         color: silver,
+    //         borderRadius: BorderRadius.only(
+    //             topLeft: Radius.circular(16), topRight: Radius.circular(16))),
+    //     width: constraints.maxWidth,
+    //     child: Text(
+    //       'POTE PRATA - Prêmio 50% do valor total',
+    //       style: JackFontStyle.body
+    //           .copyWith(color: secondaryColor, fontWeight: FontWeight.w900),
+    //     ),
+    //   );
+
+    default:
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: const BoxDecoration(
+            color: gold,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16), topRight: Radius.circular(16))),
+        width: constraints.maxWidth,
+        child: Text(
+          'POTE $levelº PRÊMIO',
+          style: JackFontStyle.body
+              .copyWith(color: secondaryColor, fontWeight: FontWeight.w900),
+        ),
+      );
+  }
+}
+
+Widget levelPotCard(int level, BoxConstraints constraints) {
   switch (level) {
     case 1:
       return Container(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jackpot/components/buttons/selectable_rounded_button.dart';
 import 'package:jackpot/components/cards/match_card_carousel.dart';
 import 'package:jackpot/core/store/core_controller.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/presenter/features/jackpot/store/jackpot_controller.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
@@ -19,8 +19,8 @@ class NotLoggedUserContent extends StatelessWidget {
       SizedBox(
         height: Responsive.getHeightValue(16),
       ),
-      Selector<JackpotController, List<JackpotEntity>>(
-          selector: (context, controller) => controller.selectedJackpot!,
+      Selector<JackpotController, List<SportJackpotEntity>>(
+          selector: (context, controller) => controller.selectedSportsJackpot!,
           builder: (context, jackpots, child) => Padding(
                 padding: EdgeInsets.only(bottom: Responsive.getHeightValue(16)),
                 child: MatchCardCarousel(

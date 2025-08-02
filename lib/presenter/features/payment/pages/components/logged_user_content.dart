@@ -333,7 +333,7 @@ class _LoggedUserContentState extends State<LoggedUserContent> {
                           log('Valido');
                           await controller.getPaymentPublicKey();
 
-                          if (controller.hasError) {
+                          if (controller.hasError && context.mounted) {
                             await ErrorDialog.show(
                                 'Atenção', controller.exception!, context);
                             return;

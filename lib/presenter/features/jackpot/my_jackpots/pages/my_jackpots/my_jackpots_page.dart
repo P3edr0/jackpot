@@ -133,6 +133,8 @@ class _MyJackpotsPageState extends State<MyJackpotsPage> {
                                             const EdgeInsets.only(bottom: 16),
                                         child: ChampionshipJackCard(
                                           onTap: () async {
+                                            final selectedTempBets = controller
+                                                .getSelectedTempBets(jack.id);
                                             final detailsController = Provider
                                                 .of<MyJackpotsDetailsController>(
                                                     context,
@@ -141,6 +143,9 @@ class _MyJackpotsPageState extends State<MyJackpotsPage> {
                                                 .getUserSelectedJackpotBets(
                                                     jack);
 
+                                            detailsController
+                                                .setSelectedTempBets(
+                                                    selectedTempBets);
                                             detailsController
                                                 .setSelectedBetJackpot(jack);
                                             detailsController

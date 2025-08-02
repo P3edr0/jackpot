@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
 import 'package:jackpot/shared/utils/enums/bet_status.dart';
+import 'package:jackpot/shared/utils/formatters/date_formatter.dart';
 import 'package:jackpot/theme/colors.dart';
 
 class BetResumeCard extends StatelessWidget {
@@ -15,14 +16,18 @@ class BetResumeCard extends StatelessWidget {
   });
 
   final String couponId;
-  final List<String> awards;
-  final String createdAt;
+  final String awards;
+  final DateTime? createdAt;
   final BetStatus status;
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) {
-    final handledCreateAt =
-        createdAt.trim().isEmpty ? '- - / - - / - -' : createdAt;
+    late String handledCreateAt;
+    if (createdAt == null) {
+      handledCreateAt = '- - / - - / - -';
+    } else {
+      handledCreateAt = JackDateFormat.betTimeFormat(createdAt!);
+    }
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -63,10 +68,9 @@ class BetResumeCard extends StatelessWidget {
                       SizedBox(
                         height: Responsive.getHeightValue(10),
                       ),
-                      Text('Bicicleta elétrica', style: JackFontStyle.body),
-                      const Text(
-                        '',
-                      ),
+                      SizedBox(
+                          width: Responsive.getHeightValue(200),
+                          child: Text(awards, style: JackFontStyle.body)),
                     ],
                   ),
                   const Spacer(),

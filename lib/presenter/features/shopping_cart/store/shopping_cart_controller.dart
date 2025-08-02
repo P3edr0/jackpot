@@ -5,6 +5,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/domain/entities/shopping_cart_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/domain/exceptions/auth_exceptions.dart';
 import 'package:jackpot/domain/usecases/jackpot/get_jackpot_usecase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -81,7 +82,7 @@ class ShoppingCartController extends ChangeNotifier {
     final responses = await Future.wait(callbacks);
     for (var response in responses) {
       final handledResponse =
-          response as Either<IJackExceptions, JackpotEntity>;
+          response as Either<IJackExceptions, SportJackpotEntity>;
       handledResponse.fold((exception) {}, (jackpot) {
         final jackMap = jackpots.firstWhere((map) => map['id'] == jackpot.id);
         final newItem = JackpotAggregateEntity(

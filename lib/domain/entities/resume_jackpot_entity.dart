@@ -13,5 +13,5 @@ class ResumeJackpotEntity {
   String potValue;
   String title;
   bool isFavorite;
-  JackpotType? jackpotType;
+  SportJackpotType? jackpotType;
 }

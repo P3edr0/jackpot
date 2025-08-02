@@ -6,13 +6,17 @@ import 'package:jackpot/components/cards/bet_resume_card.dart';
 import 'package:jackpot/components/cards/championship_jack_card.dart';
 import 'package:jackpot/components/loadings/loading.dart';
 import 'package:jackpot/domain/entities/bet_made_entity.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
+import 'package:jackpot/domain/entities/pix_entity.dart';
 import 'package:jackpot/domain/entities/shopping_cart_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_bar.dart';
+import 'package:jackpot/presenter/features/jackpot/coupon_select/store/coupon_select_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_questions/store/jackpot_questions_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/my_jackpots/pages/my_jackpots/store/my_jackpots_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/my_jackpots/pages/my_jackpots_details/store/my_jackpots_details_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/store/jackpot_controller.dart';
+import 'package:jackpot/presenter/features/payment/pages/pix_page/store/pix_controller.dart';
+import 'package:jackpot/presenter/features/payment/pages/store/payment_controller.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
 import 'package:jackpot/shared/utils/app_assets.dart';
@@ -36,6 +40,8 @@ class _MyJackpotsDetailsPageState extends State<MyJackpotsDetailsPage> {
     super.initState();
     controller =
         Provider.of<MyJackpotsDetailsController>(context, listen: false);
+
+    controller.groupLists();
   }
 
   @override
@@ -69,7 +75,7 @@ class _MyJackpotsDetailsPageState extends State<MyJackpotsDetailsPage> {
                                   ),
                                   Column(children: [
                                     Selector<MyJackpotsDetailsController,
-                                            JackpotEntity?>(
+                                            SportJackpotEntity?>(
                                         selector: (_, controller) =>
                                             controller.betSelectedJackpot,
                                         builder: (context, jackpot, child) {
@@ -160,54 +166,185 @@ class _MyJackpotsDetailsPageState extends State<MyJackpotsDetailsPage> {
                                                             color: mediumGrey)),
                                               ],
                                               ...controller.filteredUserBets
-                                                  .map((bet) => BetResumeCard(
-                                                        couponId:
-                                                            bet.couponNumber,
-                                                        createdAt:
-                                                            bet.createdAt,
-                                                        awards: const [],
-                                                        status: bet.status!,
-                                                        onTap: () {
-                                                          final questionsController =
-                                                              Provider.of<
-                                                                      JackpotQuestionsController>(
-                                                                  context,
-                                                                  listen:
-                                                                      false);
-                                                          final jackpotController =
-                                                              Provider.of<
-                                                                      JackpotController>(
-                                                                  context,
-                                                                  listen:
-                                                                      false);
-
-                                                          jackpotController
-                                                              .setSelectedJackpot([
-                                                            controller
-                                                                .betSelectedJackpot!
-                                                          ]);
-                                                          final handledJackpot =
-                                                              JackpotAggregateEntity(
-                                                                  couponPrice:
-                                                                      00,
-                                                                  couponsQuantity:
-                                                                      1,
-                                                                  jackpot:
-                                                                      controller
-                                                                          .betSelectedJackpot!);
-                                                          questionsController
-                                                              .setIsQuestionsPreview(
-                                                                  true,
-                                                                  [
-                                                                    handledJackpot
-                                                                  ],
-                                                                  bet.answers);
-                                                          Navigator.pushNamed(
+                                                  .map(
+                                                (bet) => BetResumeCard(
+                                                  couponId: bet.couponNumber,
+                                                  createdAt: bet.createdAt,
+                                                  awards:
+                                                      controller.getBetAwards(),
+                                                  status: bet.status!,
+                                                  onTap: () {
+                                                    final couponsController =
+                                                        Provider.of<
+                                                                CouponSelectController>(
+                                                            context,
+                                                            listen: false);
+                                                    final paymentController =
+                                                        Provider.of<
+                                                                PaymentController>(
+                                                            context,
+                                                            listen: false);
+                                                    final questionsController =
+                                                        Provider.of<
+                                                                JackpotQuestionsController>(
+                                                            context,
+                                                            listen: false);
+                                                    final jackpotController =
+                                                        Provider.of<
+                                                                JackpotController>(
+                                                            context,
+                                                            listen: false);
+                                                    if (bet.status!
+                                                            .isWaitingPayment &&
+                                                        bet.temporaryBet !=
+                                                            null &&
+                                                        bet.temporaryBet!
+                                                                .pixQrCode !=
+                                                            null) {
+                                                      paymentController
+                                                          .setTempPaymentId(bet
+                                                              .temporaryBet!
+                                                              .paymentId!);
+                                                      jackpotController
+                                                          .setSelectedJackpot([
+                                                        controller
+                                                            .betSelectedJackpot!
+                                                      ]);
+                                                      final handledJackpot =
+                                                          JackpotAggregateEntity(
+                                                              couponPrice: bet
+                                                                  .temporaryBet!
+                                                                  .couponPrice,
+                                                              couponsQuantity: bet
+                                                                  .temporaryBet!
+                                                                  .couponQuantity,
+                                                              jackpot: controller
+                                                                  .betSelectedJackpot!);
+                                                      questionsController
+                                                          .setIsQuestionsPreview(
+                                                        newIsQuestionPreview:
+                                                            false,
+                                                        newJackpots: [
+                                                          handledJackpot
+                                                        ],
+                                                      );
+                                                      jackpotController
+                                                          .setTemporaryBets([
+                                                        bet.temporaryBet!
+                                                      ]);
+                                                      final pixController =
+                                                          Provider.of<
+                                                                  PixController>(
                                                               context,
-                                                              AppRoutes
-                                                                  .jackpotQuestions);
-                                                        },
-                                                      ))
+                                                              listen: false);
+
+                                                      final tempBet =
+                                                          bet.temporaryBet!;
+                                                      final paymentValue =
+                                                          tempBet.couponPrice *
+                                                              tempBet
+                                                                  .couponQuantity;
+
+                                                      final newPix = PixEntity(
+                                                          id: tempBet
+                                                              .paymentId!,
+                                                          value: paymentValue,
+                                                          qrCode: tempBet
+                                                              .pixQrCode!,
+                                                          expireAt: tempBet
+                                                              .createdAt!
+                                                              .add(const Duration(
+                                                                  minutes:
+                                                                      1439)),
+                                                          copyPaste: tempBet
+                                                              .pixCopyPaste!);
+                                                      pixController
+                                                          .setPix(newPix);
+                                                      couponsController
+                                                          .setTotalValueComponents(
+                                                              tempBet
+                                                                  .couponPrice,
+                                                              tempBet
+                                                                  .couponQuantity);
+                                                      Navigator.pushNamed(
+                                                          context,
+                                                          AppRoutes.qrCodePix);
+                                                      return;
+                                                    }
+
+                                                    if (bet.status!
+                                                        .isWaitingAnswer) {
+                                                      final tempBet =
+                                                          bet.temporaryBet!;
+
+                                                      couponsController
+                                                          .setTotalValueComponents(
+                                                              tempBet
+                                                                  .couponPrice,
+                                                              tempBet
+                                                                  .couponQuantity);
+                                                      paymentController
+                                                          .setTempPaymentId(
+                                                              tempBet
+                                                                  .paymentId!);
+                                                      jackpotController
+                                                          .setSelectedJackpot([
+                                                        controller
+                                                            .betSelectedJackpot!
+                                                      ]);
+                                                      final handledJackpot =
+                                                          JackpotAggregateEntity(
+                                                              couponPrice: bet
+                                                                  .temporaryBet!
+                                                                  .couponPrice,
+                                                              couponsQuantity: bet
+                                                                  .temporaryBet!
+                                                                  .couponQuantity,
+                                                              jackpot: controller
+                                                                  .betSelectedJackpot!);
+                                                      questionsController
+                                                          .setIsQuestionsPreview(
+                                                        newIsQuestionPreview:
+                                                            false,
+                                                        newJackpots: [
+                                                          handledJackpot
+                                                        ],
+                                                      );
+
+                                                      Navigator.pushNamed(
+                                                          context,
+                                                          AppRoutes
+                                                              .jackpotQuestions);
+                                                      return;
+                                                    }
+
+                                                    jackpotController
+                                                        .setSelectedJackpot([
+                                                      controller
+                                                          .betSelectedJackpot!
+                                                    ]);
+                                                    final handledJackpot =
+                                                        JackpotAggregateEntity(
+                                                            couponPrice: 00,
+                                                            couponsQuantity: 1,
+                                                            jackpot: controller
+                                                                .betSelectedJackpot!);
+                                                    questionsController
+                                                        .setIsQuestionsPreview(
+                                                            newIsQuestionPreview:
+                                                                true,
+                                                            newJackpots: [
+                                                              handledJackpot
+                                                            ],
+                                                            betQuestions:
+                                                                bet.answers);
+                                                    Navigator.pushNamed(
+                                                        context,
+                                                        AppRoutes
+                                                            .jackpotQuestions);
+                                                  },
+                                                ),
+                                              )
                                             ])),
                                   ])
                                 ]));

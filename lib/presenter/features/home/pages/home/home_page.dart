@@ -56,8 +56,8 @@ class _HomePageState extends State<HomePage> {
               return;
             }
 
-            bool shouldPop =
-                await QuitAppDialog.show('Sair do Jackpot?', "", context);
+            bool shouldPop = await QuitAppDialog.show(
+                'Sair do Jackpot?', "Deseja sair do Jackpot?", context);
             if (shouldPop) {
               SystemNavigator.pop();
             }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jackpot/domain/entities/bet_question_review_entity.dart';
 import 'package:jackpot/domain/entities/double_subjective_question.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/domain/entities/objective_question_entity.dart';
 import 'package:jackpot/domain/entities/question_group_entity.dart';
 import 'package:jackpot/domain/entities/shopping_cart_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/single_subjective_question.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 
 class JackpotQuestionsController extends ChangeNotifier {
   //////////////////////// VARS //////////////////////////////
@@ -14,7 +14,7 @@ class JackpotQuestionsController extends ChangeNotifier {
   List<JackpotAggregateEntity> _betQueue = [];
   QuestionGroupEntity _questionsStructure = QuestionGroupEntity(questions: []);
   List<QuestionGroupEntity> _questionsStructurePages = [];
-  JackpotEntity? _selectedJackpot;
+  SportJackpotEntity? _selectedJackpot;
   int? _couponsQuantity;
   int _currentQuestionPage = 1;
   int _completedQuestions = 0;
@@ -24,7 +24,7 @@ class JackpotQuestionsController extends ChangeNotifier {
   QuestionGroupEntity _previewQuestionStructure =
       QuestionGroupEntity(questions: []);
   //////////////////////// GETS //////////////////////////////
-  JackpotEntity? get selectedJackpot => _selectedJackpot;
+  SportJackpotEntity? get selectedJackpot => _selectedJackpot;
   int? get couponsQuantity => _couponsQuantity;
   int get currentQuestionPage => _currentQuestionPage;
   int get remainQuestions => couponsQuantity! - _completedQuestions;
@@ -57,19 +57,24 @@ class JackpotQuestionsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  setIsQuestionsPreview(bool value, List<JackpotAggregateEntity> newJackpots,
-      [List<BetQuestionReviewEntity> betQuestions = const []]) {
-    _isQuestionsPreview = value;
+  setIsQuestionsPreview(
+      {required bool newIsQuestionPreview,
+      required List<JackpotAggregateEntity> newJackpots,
+      List<BetQuestionReviewEntity> betQuestions = const []}) {
+    _isQuestionsPreview = newIsQuestionPreview;
     if (_isQuestionsPreview) {
       startJackpotStructure(
-        newJackpots,
-        betQuestions,
-        _isQuestionsPreview,
+        newJackpots: newJackpots,
+        isPreview: _isQuestionsPreview,
+        betAnswers: betQuestions,
       );
 
       _questionsStructure = _previewQuestionStructure;
     } else {
-      startJackpotStructure(newJackpots, betQuestions, _isQuestionsPreview);
+      startJackpotStructure(
+          newJackpots: newJackpots,
+          betAnswers: betQuestions,
+          isPreview: _isQuestionsPreview);
 
       _questionsStructure = _questionsStructurePages.first;
     }
@@ -146,9 +151,10 @@ class JackpotQuestionsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void startJackpotStructure(List<JackpotAggregateEntity> newJackpots,
-      List<BetQuestionReviewEntity> betAnswers,
-      [bool isPreview = false]) {
+  void startJackpotStructure(
+      {required List<JackpotAggregateEntity> newJackpots,
+      required List<BetQuestionReviewEntity> betAnswers,
+      bool isPreview = false}) {
     final currentJackpot = newJackpots.first;
     if (currentJackpot.jackpot.id == _selectedJackpot?.id &&
         currentJackpot.couponsQuantity == _couponsQuantity &&
@@ -160,7 +166,7 @@ class JackpotQuestionsController extends ChangeNotifier {
       _betQueue = [...newJackpots];
     }
     _currentQuestionPage = 1;
-    _selectedJackpot = newJackpots.first.jackpot;
+    _selectedJackpot = newJackpots.first.jackpot as SportJackpotEntity;
     _couponsQuantity = newJackpots.first.couponsQuantity;
     checkIsLastPage();
     _completedQuestions = 0;

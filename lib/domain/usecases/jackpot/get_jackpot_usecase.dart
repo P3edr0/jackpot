@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/domain/entities/resume_championship_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/team_entity.dart';
 import 'package:jackpot/domain/exceptions/auth_exceptions.dart';
 import 'package:jackpot/domain/repositories/championship/championship_repository.dart';
@@ -20,7 +20,8 @@ class GetJackpotUsecase {
   IGetTeamRepository teamRepository;
   IGetChampionshipRepository championshipRepository;
   IFetchAllTeamJackpotRepository fetchAllTeamJackpotRepository;
-  Future<Either<IJackExceptions, JackpotEntity>> call(String jackpotId) async {
+  Future<Either<IJackExceptions, SportJackpotEntity>> call(
+      String jackpotId) async {
     if (jackpotId.trim().isEmpty) {
       return Left(
           DataException(message: 'O Id do jackpot não pode ser vazio.'));

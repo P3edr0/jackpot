@@ -80,4 +80,12 @@ class CouponSelectController extends ChangeNotifier {
     _updateTotalValue();
     notifyListeners();
   }
+
+  void setTotalValueComponents(double newCouponPrice, int newCouponsQuantity) {
+    _couponPrice = newCouponPrice;
+    _couponsQuantity = newCouponsQuantity;
+
+    _updateTotalValue();
+    notifyListeners();
+  }
 }

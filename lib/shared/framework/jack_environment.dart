@@ -3,6 +3,9 @@ abstract class JackEnvironment {
   static const apiUrl = String.fromEnvironment(
     'api_url',
   );
+  static const extraApiUrl = String.fromEnvironment(
+    'extra_api_url',
+  );
   static const paymentApi = String.fromEnvironment(
     'payment_api',
   );

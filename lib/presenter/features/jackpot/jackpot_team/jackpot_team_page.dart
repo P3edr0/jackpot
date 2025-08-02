@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jackpot/components/appbar/appbar_secondary.dart';
 import 'package:jackpot/components/buttons/selectable_rounded_button.dart';
+import 'package:jackpot/components/cards/awards_card.dart';
 import 'package:jackpot/components/cards/banner_card.dart';
 import 'package:jackpot/components/cards/championship_jack_card.dart';
 import 'package:jackpot/components/loadings/loading.dart';
 import 'package:jackpot/components/shopping_cart_item.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_bar.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_team/store/jackpot_team_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/store/jackpot_controller.dart';
@@ -112,69 +112,135 @@ class _JackpotTeamPageState extends State<JackpotTeamPage> {
                                               height:
                                                   Responsive.getHeightValue(16),
                                             ),
-                                            Selector<JackpotTeamController,
-                                                    List<JackpotEntity>>(
-                                                selector: (context,
-                                                        controller) =>
-                                                    controller
-                                                        .teamCompleteJackpots,
-                                                builder:
-                                                    (context, jackpots, child) {
-                                                  if (jackpots.isEmpty) {
-                                                    return Center(
-                                                      heightFactor: 8,
-                                                      child: Text('Lista Vazia',
-                                                          style: JackFontStyle
-                                                              .title
-                                                              .copyWith(
-                                                                  color:
-                                                                      darkBlue)),
-                                                    );
-                                                  }
-                                                  return Column(
-                                                    children: jackpots
-                                                        .map((jack) => Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    bottom: 16),
-                                                            child:
-                                                                ChampionshipJackCard(
-                                                              onTap: () {
-                                                                final jackController =
-                                                                    Provider.of<
-                                                                            JackpotController>(
-                                                                        context,
-                                                                        listen:
-                                                                            false);
-                                                                jackController
-                                                                    .setSelectedJackpot(
-                                                                        [jack]);
-                                                                Navigator.pushNamed(
-                                                                    context,
-                                                                    AppRoutes
-                                                                        .couponSelect);
-                                                              },
-                                                              title: jack
-                                                                  .championship
-                                                                  .name,
-                                                              constraints:
-                                                                  constraints,
-                                                              image:
-                                                                  jack.banner,
-                                                              date: jack
-                                                                  .matchTime,
-                                                              homeTeam:
-                                                                  jack.homeTeam,
-                                                              visitTeam: jack
-                                                                  .visitorTeam,
-                                                              isFavorite: true,
-                                                              setFavorite:
-                                                                  () {},
-                                                            )))
-                                                        .toList(),
+                                            Consumer<JackpotTeamController>(
+                                                builder: (context,
+                                                    jackpotTeamController,
+                                                    child) {
+                                              final jackpots =
+                                                  jackpotTeamController
+                                                      .teamCompleteJackpots;
+                                              if (jackpots.isEmpty) {
+                                                return Center(
+                                                  heightFactor: 8,
+                                                  child: Text('Lista Vazia',
+                                                      style: JackFontStyle.title
+                                                          .copyWith(
+                                                              color: darkBlue)),
+                                                );
+                                              }
+                                              if (jackpotTeamController
+                                                  .jackFiltersType.isPots) {
+                                                return Center(
+                                                  heightFactor: 8,
+                                                  child: Text('Lista Vazia',
+                                                      style: JackFontStyle.title
+                                                          .copyWith(
+                                                              color: darkBlue)),
+                                                );
+                                              }
+                                              if (jackpotTeamController
+                                                  .jackFiltersType.isAwards) {
+                                                final handledJackpots =
+                                                    jackpots.where((element) =>
+                                                        element.awards !=
+                                                            null &&
+                                                        element.awards!
+                                                            .isNotEmpty);
+                                                if (handledJackpots.isEmpty) {
+                                                  return Center(
+                                                    heightFactor: 8,
+                                                    child: Text('Lista Vazia',
+                                                        style: JackFontStyle
+                                                            .title
+                                                            .copyWith(
+                                                                color:
+                                                                    darkBlue)),
                                                   );
-                                                }),
+                                                }
+
+                                                return Column(
+                                                  children: handledJackpots
+                                                      .map((jack) {
+                                                    return Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                bottom: 16),
+                                                        child: AwardsCard(
+                                                          onTap: () {
+                                                            final jackController =
+                                                                Provider.of<
+                                                                        JackpotController>(
+                                                                    context,
+                                                                    listen:
+                                                                        false);
+                                                            jackController
+                                                                .setSelectedJackpot(
+                                                                    [jack]);
+                                                            Navigator.pushNamed(
+                                                                context,
+                                                                AppRoutes
+                                                                    .couponSelect);
+                                                          },
+                                                          title: jack
+                                                              .championship
+                                                              .name,
+                                                          constraints:
+                                                              constraints,
+                                                          awards:
+                                                              jack.awards ?? [],
+                                                          date: jack.matchTime,
+                                                          homeTeam:
+                                                              jack.homeTeam,
+                                                          visitTeam:
+                                                              jack.visitorTeam,
+                                                          isFavorite: true,
+                                                          setFavorite: () {},
+                                                        ));
+                                                  }).toList(),
+                                                );
+                                              }
+                                              return Column(
+                                                children: jackpots
+                                                    .map((jack) => Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                bottom: 16),
+                                                        child:
+                                                            ChampionshipJackCard(
+                                                          onTap: () {
+                                                            final jackController =
+                                                                Provider.of<
+                                                                        JackpotController>(
+                                                                    context,
+                                                                    listen:
+                                                                        false);
+                                                            jackController
+                                                                .setSelectedJackpot(
+                                                                    [jack]);
+                                                            Navigator.pushNamed(
+                                                                context,
+                                                                AppRoutes
+                                                                    .couponSelect);
+                                                          },
+                                                          title: jack
+                                                              .championship
+                                                              .name,
+                                                          constraints:
+                                                              constraints,
+                                                          image: jack.banner,
+                                                          date: jack.matchTime,
+                                                          homeTeam:
+                                                              jack.homeTeam,
+                                                          visitTeam:
+                                                              jack.visitorTeam,
+                                                          isFavorite: true,
+                                                          setFavorite: () {},
+                                                        )))
+                                                    .toList(),
+                                              );
+                                            }),
                                           ],
                                         ),
                                       ),

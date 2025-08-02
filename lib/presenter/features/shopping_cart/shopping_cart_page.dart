@@ -6,6 +6,8 @@ import 'package:jackpot/components/buttons/selectable_rounded_button.dart';
 import 'package:jackpot/components/cards/small_item_shopping_card.dart';
 import 'package:jackpot/components/loadings/loading.dart';
 import 'package:jackpot/domain/entities/shopping_cart_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/temporary_bet_entity.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_bar.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_questions/store/jackpot_questions_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/store/jackpot_controller.dart';
@@ -133,6 +135,9 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                                                     bottom: 16),
                                                 child: SmallItemShoppingCard(
                                                   onTap: () {
+                                                    final handledSportsJack =
+                                                        jack.jackpot
+                                                            as SportJackpotEntity;
                                                     final paymentController =
                                                         Provider.of<
                                                                 PaymentController>(
@@ -156,17 +161,34 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                                                     paymentController.setPaymentData(
                                                         newCouponsQuantity: jack
                                                             .couponsQuantity,
+                                                        newPaymentCouponsQuantity:
+                                                            jack
+                                                                .couponsQuantity,
                                                         newTotalValue:
                                                             jackTotalPrice,
                                                         newUnitValue:
                                                             jack.couponPrice,
                                                         newItemPaymentDescription:
-                                                            "JACKPOT ${jack.jackpot.jackpotOwnerTeam.name} - ID ${jack.jackpot.id}",
+                                                            "JACKPOT ${handledSportsJack.jackpotOwnerTeam.name} - ID ${handledSportsJack.id}",
                                                         newItemDescription:
-                                                            "JACKPOT ${jack.jackpot.jackpotOwnerTeam.name}");
+                                                            "JACKPOT ${handledSportsJack.jackpotOwnerTeam.name}");
+
+                                                    final newTemporaryBet =
+                                                        TemporaryBetEntity(
+                                                            couponQuantity: jack
+                                                                .couponsQuantity,
+                                                            jackpotId:
+                                                                jack.jackpot.id,
+                                                            couponPrice: jack
+                                                                .couponPrice);
+
+                                                    jackController
+                                                        .setTemporaryBets(
+                                                            [newTemporaryBet]);
                                                     questionsController
                                                         .startJackpotStructure(
-                                                            [jack], []);
+                                                            newJackpots: [jack],
+                                                            betAnswers: []);
                                                     Navigator.pushNamed(context,
                                                         AppRoutes.payment);
                                                   },
@@ -208,7 +230,8 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                                         borderWidth: 2,
                                         onTap: () {
                                           final jacks = controller.cartItems
-                                              .map((item) => item.jackpot)
+                                              .map((item) => item.jackpot
+                                                  as SportJackpotEntity)
                                               .toList();
                                           final paymentController =
                                               Provider.of<PaymentController>(
@@ -240,6 +263,21 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                                             itemDescription =
                                                 "JACKPOT ${jacks.first.jackpotOwnerTeam.name} ";
                                           }
+
+                                          final newTemporaryBets = controller
+                                              .cartItems
+                                              .map((element) =>
+                                                  TemporaryBetEntity(
+                                                      couponQuantity: element
+                                                          .couponsQuantity,
+                                                      jackpotId:
+                                                          element.jackpot.id,
+                                                      couponPrice:
+                                                          element.couponPrice))
+                                              .toList();
+
+                                          jackController.setTemporaryBets(
+                                              newTemporaryBets);
                                           paymentController.setPaymentData(
                                               newCouponsQuantity:
                                                   controller.totalCoupons,
@@ -255,7 +293,9 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
 
                                           questionsController
                                               .startJackpotStructure(
-                                                  controller.cartItems, []);
+                                                  newJackpots:
+                                                      controller.cartItems,
+                                                  betAnswers: []);
 
                                           Navigator.pushNamed(
                                               context, AppRoutes.payment);

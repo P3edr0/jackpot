@@ -2,14 +2,20 @@ import 'package:jackpot/core/store/core_controller.dart';
 import 'package:jackpot/data/datasources/auth/check_credential_datasource_impl.dart';
 import 'package:jackpot/data/datasources/auth/create_user_datasource_impl.dart';
 import 'package:jackpot/data/datasources/auth/login_datasource_impl.dart';
+import 'package:jackpot/data/datasources/award/fetch_all_awards_datasource_impl.dart';
 import 'package:jackpot/data/datasources/base_datasources/auth/check_credential_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/auth/create_user_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/auth/login_datasource.dart';
+import 'package:jackpot/data/datasources/base_datasources/award/fetch_all_awards_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/bet/get_bet_made_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/bet/get_jackpot_bet_id_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/championship/get_championship_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/complements/country_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/bet/create_bet_datasource.dart';
+import 'package:jackpot/data/datasources/base_datasources/jackpot/bet/create_temp_bet_datasource.dart';
+import 'package:jackpot/data/datasources/base_datasources/jackpot/bet/delete_temp_bets_datasource.dart';
+import 'package:jackpot/data/datasources/base_datasources/jackpot/bet/get_temp_bets_datasource.dart';
+import 'package:jackpot/data/datasources/base_datasources/jackpot/extra/fetch_extra_jackpot_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/fetch_all_team_jackpot_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/get_jackpot_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/group_by_championship_jackpot_datasource.dart';
@@ -27,11 +33,15 @@ import 'package:jackpot/data/datasources/bet/get_bet_made_datasource_impl.dart';
 import 'package:jackpot/data/datasources/bet/get_jackpot_bet_id_datasource_impl.dart';
 import 'package:jackpot/data/datasources/championship/get_championship_datasource_impl.dart';
 import 'package:jackpot/data/datasources/complements/country_datasource_impl.dart';
+import 'package:jackpot/data/datasources/extra/fetch_extra_jackpot_datasource_impl.dart';
 import 'package:jackpot/data/datasources/jackpot/create_bet_datasource_impl.dart';
 import 'package:jackpot/data/datasources/jackpot/get_jackpot_datasource_impl.dart';
-import 'package:jackpot/data/datasources/local/secure_storage/create_session.dart';
-import 'package:jackpot/data/datasources/local/secure_storage/delete_session.dart';
-import 'package:jackpot/data/datasources/local/secure_storage/get_session.dart';
+import 'package:jackpot/data/datasources/local/secure_storage/session/create_session.dart';
+import 'package:jackpot/data/datasources/local/secure_storage/session/delete_session.dart';
+import 'package:jackpot/data/datasources/local/secure_storage/session/get_session.dart';
+import 'package:jackpot/data/datasources/local/secure_storage/temp_bet/delete_temp_bets.dart';
+import 'package:jackpot/data/datasources/local/secure_storage/temp_bet/get_temp_bets.dart';
+import 'package:jackpot/data/datasources/local/secure_storage/temp_bet/update_temp_bet.dart';
 import 'package:jackpot/data/datasources/payment/card_payment_datasource_impl.dart';
 import 'package:jackpot/data/datasources/payment/get_payment_public_key_datasource_impl.dart';
 import 'package:jackpot/data/datasources/payment/get_pix_datasource_impl.dart';
@@ -43,6 +53,7 @@ import 'package:jackpot/data/datasources/team/list_by_championship_jackpot_datas
 import 'package:jackpot/data/datasources/team/list_by_team_jackpot_datasource_impl.dart';
 import 'package:jackpot/data/repositories/auth/create_user/create_user_repository_impl.dart';
 import 'package:jackpot/data/repositories/auth/login/login_repository_impl.dart';
+import 'package:jackpot/data/repositories/award/award_repository_impl.dart';
 import 'package:jackpot/data/repositories/bet/bet_repository_impl.dart';
 import 'package:jackpot/data/repositories/championship/championship_repository_impl.dart';
 import 'package:jackpot/data/repositories/complements/country_repository_impl.dart';
@@ -53,6 +64,7 @@ import 'package:jackpot/data/repositories/session/delete_session_repository_impl
 import 'package:jackpot/data/repositories/session/get_session_repository_impl.dart';
 import 'package:jackpot/data/repositories/team/team_repository_impl.dart';
 import 'package:jackpot/domain/repositories/auth/auth_repository.dart';
+import 'package:jackpot/domain/repositories/award/award_repository.dart';
 import 'package:jackpot/domain/repositories/bet/bet_repository.dart';
 import 'package:jackpot/domain/repositories/championship/championship_repository.dart';
 import 'package:jackpot/domain/repositories/complements/login_repository.dart';
@@ -64,9 +76,14 @@ import 'package:jackpot/domain/usecases/auth/complements/country_usecase.dart';
 import 'package:jackpot/domain/usecases/auth/create_user/create_user_usecase.dart';
 import 'package:jackpot/domain/usecases/auth/login/check_credential_usecase.dart';
 import 'package:jackpot/domain/usecases/auth/login/login_usecase.dart';
+import 'package:jackpot/domain/usecases/award/fetch_all_awards_usecase.dart';
 import 'package:jackpot/domain/usecases/bet/get_bet_made_usecase.dart';
-import 'package:jackpot/domain/usecases/jackpot/create_bet_usecase.dart';
+import 'package:jackpot/domain/usecases/jackpot/bet/create_bet_usecase.dart';
+import 'package:jackpot/domain/usecases/jackpot/bet/delete_temp_bet_usecase.dart';
+import 'package:jackpot/domain/usecases/jackpot/bet/get_temp_bets_usecase.dart';
+import 'package:jackpot/domain/usecases/jackpot/bet/update_temp_bet_usecase.dart';
 import 'package:jackpot/domain/usecases/jackpot/fetch_all_team_jackpot_usecase.dart';
+import 'package:jackpot/domain/usecases/jackpot/fetch_extra_jackpot_usecase.dart';
 import 'package:jackpot/domain/usecases/jackpot/get_jackpot_usecase.dart';
 import 'package:jackpot/domain/usecases/jackpot/group_by_championship_jackpot_usecase.dart';
 import 'package:jackpot/domain/usecases/jackpot/list_by_championship_jackpot_usecase.dart';
@@ -187,12 +204,30 @@ class Providers {
       ),
     ),
 
+//////////////// EXTRA  //////////////////////////////
+    Provider<IFetchExtraJackpotDatasource>(
+      create: (ctx) => FetchExtraJackpotDatasourceImpl(),
+    ),
+    Provider<IFetchExtraJackpotRepository>(
+      create: (ctx) => FetchExtraJackpotRepositoryImpl(
+          datasource:
+              Provider.of<IFetchExtraJackpotDatasource>(ctx, listen: false)),
+    ),
+    Provider<FetchExtraJackpotUsecase>(
+      create: (ctx) => FetchExtraJackpotUsecase(
+        repository:
+            Provider.of<IFetchExtraJackpotRepository>(ctx, listen: false),
+      ),
+    ),
+
     ChangeNotifierProvider<HomeController>(
       create: (ctx) => HomeController(
         fetchAllTeamJackpotUsecase:
             Provider.of<FetchAllTeamJackpotUsecase>(ctx, listen: false),
         groupByChampionshipJackpotUsecase:
             Provider.of<GroupByChampionshipJackpotUsecase>(ctx, listen: false),
+        fetchExtraJackpotUsecase:
+            Provider.of<FetchExtraJackpotUsecase>(ctx, listen: false),
       ),
     ),
     ChangeNotifierProvider<ViewerDocsController>(
@@ -500,13 +535,6 @@ class Providers {
         repository: Provider.of<ICreateBetRepository>(ctx, listen: false),
       ),
     ),
-    Provider<IGetBetMadeDatasource>(
-      create: (ctx) => GetBetMadeDatasourceImpl(),
-    ),
-    Provider<IGetBetMadeRepository>(
-      create: (ctx) => GetBetMadeRepositoryImpl(
-          datasource: Provider.of<IGetBetMadeDatasource>(ctx, listen: false)),
-    ),
     Provider<IGetJackpotsBetIdDatasource>(
       create: (ctx) => GetJackpotBetIdDatasourceImpl(),
     ),
@@ -515,6 +543,14 @@ class Providers {
           datasource:
               Provider.of<IGetJackpotsBetIdDatasource>(ctx, listen: false)),
     ),
+
+    Provider<IGetBetMadeDatasource>(
+      create: (ctx) => GetBetMadeDatasourceImpl(),
+    ),
+    Provider<IGetBetMadeRepository>(
+      create: (ctx) => GetBetMadeRepositoryImpl(
+          datasource: Provider.of<IGetBetMadeDatasource>(ctx, listen: false)),
+    ),
     Provider<GetBetMadeUsecase>(
       create: (ctx) => GetBetMadeUsecase(
         repository: Provider.of<IGetBetMadeRepository>(ctx, listen: false),
@@ -522,10 +558,64 @@ class Providers {
             Provider.of<IGetJackpotBetIdRepository>(ctx, listen: false),
       ),
     ),
+    Provider<IFetchAllAwardsDatasource>(
+      create: (ctx) => FetchAllAwardsDatasourceImpl(),
+    ),
+    Provider<IFetchAllAwardsRepository>(
+      create: (ctx) => FetchAllAwardsRepositoryImpl(
+          datasource:
+              Provider.of<IFetchAllAwardsDatasource>(ctx, listen: false)),
+    ),
+    Provider<FetchAllAwardsUsecase>(
+      create: (ctx) => FetchAllAwardsUsecase(
+        repository: Provider.of<IFetchAllAwardsRepository>(ctx, listen: false),
+      ),
+    ),
+    Provider<IUpdateTempBetDatasource>(
+      create: (ctx) => SecureStorageUpdateTempBet(),
+    ),
+    Provider<IUpdateTempBetRepository>(
+      create: (ctx) => UpdateTempBetRepositoryImpl(
+          datasource:
+              Provider.of<IUpdateTempBetDatasource>(ctx, listen: false)),
+    ),
+    Provider<UpdateTempBetUsecase>(
+      create: (ctx) => UpdateTempBetUsecase(
+        repository: Provider.of<IUpdateTempBetRepository>(ctx, listen: false),
+      ),
+    ),
+    Provider<IDeleteTempBetDatasource>(
+      create: (ctx) => SecureStorageDeleteTempBet(),
+    ),
+    Provider<IDeleteTempBetRepository>(
+      create: (ctx) => DeleteTempBetRepositoryImpl(
+          datasource:
+              Provider.of<IDeleteTempBetDatasource>(ctx, listen: false)),
+    ),
+    Provider<DeleteTempBetUsecase>(
+      create: (ctx) => DeleteTempBetUsecase(
+        repository: Provider.of<IDeleteTempBetRepository>(ctx, listen: false),
+      ),
+    ),
+    Provider<IGetTempBetsDatasource>(
+      create: (ctx) => SecureStorageGetTempBets(),
+    ),
+    Provider<IGetTempBetRepository>(
+      create: (ctx) => GetTempBetRepositoryImpl(
+          datasource: Provider.of<IGetTempBetsDatasource>(ctx, listen: false)),
+    ),
+    Provider<GetTempBetsUsecase>(
+      create: (ctx) => GetTempBetsUsecase(
+        repository: Provider.of<IGetTempBetRepository>(ctx, listen: false),
+      ),
+    ),
 
     ChangeNotifierProvider<MyJackpotsController>(
       create: (ctx) => MyJackpotsController(
+        getTempBetsUsecase: Provider.of<GetTempBetsUsecase>(ctx, listen: false),
         getJackpotUsecase: Provider.of<GetJackpotUsecase>(ctx, listen: false),
+        fetchAllAwardsUsecase:
+            Provider.of<FetchAllAwardsUsecase>(ctx, listen: false),
         listByTeamJackpotUsecase:
             Provider.of<ListByTeamJackpotUsecase>(ctx, listen: false),
         getBetMadeUsecase: Provider.of<GetBetMadeUsecase>(ctx, listen: false),
@@ -544,10 +634,14 @@ class Providers {
         getJackpotUsecase: Provider.of<GetJackpotUsecase>(ctx, listen: false),
         listByTeamJackpotUsecase:
             Provider.of<ListByTeamJackpotUsecase>(ctx, listen: false),
+        fetchAllAwardsUsecase:
+            Provider.of<FetchAllAwardsUsecase>(ctx, listen: false),
       ),
     ),
     ChangeNotifierProvider<JackpotChampionshipController>(
       create: (ctx) => JackpotChampionshipController(
+        fetchAllAwardsUsecase:
+            Provider.of<FetchAllAwardsUsecase>(ctx, listen: false),
         getJackpotUsecase: Provider.of<GetJackpotUsecase>(ctx, listen: false),
         listByChampionshipJackpotUsecase:
             Provider.of<ListByChampionshipJackpotUsecase>(ctx, listen: false),
@@ -560,6 +654,10 @@ class Providers {
         jackpotTeamController:
             Provider.of<JackpotTeamController>(ctx, listen: false),
         createBetUsecase: Provider.of<CreateBetUsecase>(ctx, listen: false),
+        updateTempBetUsecase:
+            Provider.of<UpdateTempBetUsecase>(ctx, listen: false),
+        deleteTempBetUsecase:
+            Provider.of<DeleteTempBetUsecase>(ctx, listen: false),
       ),
     ),
     ChangeNotifierProvider<ExtraJackpotController>(

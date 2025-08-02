@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jackpot/components/cards/jack_card.dart';
-import 'package:jackpot/domain/entities/resume_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/extra_jackpot_entity.dart';
 import 'package:jackpot/presenter/features/extra_jackpot/extra_jackpot_controller.dart';
 import 'package:jackpot/presenter/features/home/pages/home/store/home_controller.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/states_filter.dart';
@@ -23,7 +23,7 @@ class ExtraContent extends StatelessWidget {
         SizedBox(
           height: Responsive.getHeightValue(30),
         ),
-        Selector<HomeController, List<ResumeJackpotEntity>>(
+        Selector<HomeController, List<ExtraJackpotEntity>>(
             selector: (_, control) => control.extraJacks,
             builder: (_, jacks, __) {
               return ListView.separated(
@@ -36,20 +36,21 @@ class ExtraContent extends StatelessWidget {
                         final extraJackController =
                             Provider.of<ExtraJackpotController>(context,
                                 listen: false);
+                        extraJackController.setSelectedJackpot([jack]);
                         extraJackController.setSelectedJackpotDetails(
-                            newId: jack.jackpotId.toString(),
+                            newId: jack.id.toString(),
                             image: jack.banner,
-                            label: jack.title);
+                            label: jack.name);
                         Navigator.pushNamed(
                             context, AppRoutes.extraCouponSelect);
                       },
-                      title: jack.title,
+                      title: jack.name,
                       constraints: constraints,
                       image: jack.banner,
-                      potValue: jack.potValue,
+                      potValue: jack.budgetValue,
                       setFavorite: () =>
                           controller.setFavoriteExtraJacks(index),
-                      isFavorite: jacks[index].isFavorite,
+                      isFavorite: true,
                     );
                   },
                   separatorBuilder: (context, index) => SizedBox(

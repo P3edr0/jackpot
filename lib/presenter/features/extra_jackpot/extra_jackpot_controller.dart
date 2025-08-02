@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
+import 'package:jackpot/domain/entities/extra_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/new_user_entity.dart';
 import 'package:jackpot/domain/entities/question_group_entity.dart';
-import 'package:jackpot/domain/usecases/jackpot/create_bet_usecase.dart';
+import 'package:jackpot/domain/usecases/jackpot/bet/create_bet_usecase.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_championship/store/jackpot_championship_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_team/store/jackpot_team_controller.dart';
 
@@ -21,26 +21,26 @@ class ExtraJackpotController extends ChangeNotifier {
   String _selectedJackpotId = '';
   String _selectedJackpotImage = '';
   String _selectedJackpotLabel = '';
-  List<JackpotEntity>? _selectedJackpot;
+  List<ExtraJackpotEntity>? _selectedJackpot;
   //////////////////////// GETS //////////////////////////////
 
   String get selectedJackpotId => _selectedJackpotId;
   String get selectedJackpotImage => _selectedJackpotImage;
   String get selectedJackpotLabel => _selectedJackpotLabel;
-  List<JackpotEntity>? get selectedJackpot => _selectedJackpot;
+  List<ExtraJackpotEntity>? get selectedJackpot => _selectedJackpot;
 
   //////////////////////// FUNCTIONS //////////////////////////////
 
   Future<void> getJackpot() async {
     final jackpot = await jackpotTeamController.getJackpot(_selectedJackpotId);
     if (jackpot == null) return;
-    _selectedJackpot = [jackpot];
+    _selectedJackpot = [];
   }
 
   Future<void> getChampionshipJackpot() async {
     final jackpot = await jackpotTeamController.getJackpot(_selectedJackpotId);
     if (jackpot == null) return;
-    _selectedJackpot = [jackpot];
+    _selectedJackpot = [];
   }
 
   setSelectedJackpotDetails(
@@ -50,7 +50,7 @@ class ExtraJackpotController extends ChangeNotifier {
     _selectedJackpotImage = image;
   }
 
-  setSelectedJackpot(List<JackpotEntity>? jackpot) {
+  setSelectedJackpot(List<ExtraJackpotEntity>? jackpot) {
     _selectedJackpot = jackpot;
     notifyListeners();
   }

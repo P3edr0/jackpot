@@ -44,6 +44,7 @@ class CoreController extends ChangeNotifier {
 
   ////////////////// FUNCTIONS /////////////////////////
 
+  saveLocalBet() {}
   void addShoppingCartItem(
       JackpotEntity jackpot, int couponsQuantity, double couponsPrice) {
     shoppingCartController.addShoppingCartItem(

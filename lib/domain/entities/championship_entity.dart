@@ -12,7 +12,7 @@ class ChampionshipEntity extends ResumeJackpotEntity {
       required this.teams,
       required this.name,
       required this.id,
-      super.jackpotType = JackpotType.championship});
+      super.jackpotType = SportJackpotType.championship});
   String id;
   String name;
   List<ResumeTeamEntity> teams;

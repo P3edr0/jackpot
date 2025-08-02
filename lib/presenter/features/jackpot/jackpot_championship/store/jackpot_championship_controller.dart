@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
+import 'package:jackpot/domain/entities/award_entity.dart';
 import 'package:jackpot/domain/entities/preview_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/team_entity.dart';
+import 'package:jackpot/domain/usecases/award/fetch_all_awards_usecase.dart';
 import 'package:jackpot/domain/usecases/jackpot/get_jackpot_usecase.dart';
 import 'package:jackpot/domain/usecases/jackpot/list_by_championship_jackpot_usecase.dart';
 import 'package:jackpot/shared/utils/enums/jack_filters_type.dart';
@@ -9,9 +11,12 @@ import 'package:jackpot/shared/utils/enums/jack_filters_type.dart';
 class JackpotChampionshipController extends ChangeNotifier {
   JackpotChampionshipController(
       {required this.getJackpotUsecase,
-      required this.listByChampionshipJackpotUsecase});
+      required this.listByChampionshipJackpotUsecase,
+      required this.fetchAllAwardsUsecase});
   final GetJackpotUsecase getJackpotUsecase;
   final ListByChampionshipJackpotUsecase listByChampionshipJackpotUsecase;
+  final FetchAllAwardsUsecase fetchAllAwardsUsecase;
+
   //////////////////////// VARS //////////////////////////////
 
   bool isLoading = true;
@@ -24,8 +29,9 @@ class JackpotChampionshipController extends ChangeNotifier {
   final searchController = TextEditingController();
   JackFiltersType _jackFiltersType = JackFiltersType.all;
   final Set<TeamEntity> _filterTeams = {};
-  List<JackpotEntity> _championshipCompleteJackpots = [];
-  List<JackpotEntity> _allChampionshipCompleteJackpots = [];
+  List<SportJackpotEntity> _championshipCompleteJackpots = [];
+  List<SportJackpotEntity> _allChampionshipCompleteJackpots = [];
+  List<AwardEntity> _allAwards = [];
 
   //////////////////////// GETS //////////////////////////////
   String get selectedChampionshipId => _selectedChampionshipId;
@@ -37,9 +43,9 @@ class JackpotChampionshipController extends ChangeNotifier {
   JackFiltersType get jackFiltersType => _jackFiltersType;
   List<PreviewJackpotEntity> get championshipPreviewJackpots =>
       _championshipPreviewJackpots;
-  List<JackpotEntity> get championshipCompleteJackpots =>
+  List<SportJackpotEntity> get championshipCompleteJackpots =>
       _championshipCompleteJackpots;
-  List<JackpotEntity> get allChampionshipCompleteJackpots =>
+  List<SportJackpotEntity> get allChampionshipCompleteJackpots =>
       _allChampionshipCompleteJackpots;
   //////////////////////// FUNCTIONS //////////////////////////////
 
@@ -74,7 +80,7 @@ class JackpotChampionshipController extends ChangeNotifier {
   }
 
   //////////////////////// FUNCTIONS //////////////////////////////
-  Future<JackpotEntity?> getJackpot(String selectedJackpotId) async {
+  Future<SportJackpotEntity?> getJackpot(String selectedJackpotId) async {
     setLoading(value: true);
     final response = await getJackpotUsecase(selectedJackpotId);
 
@@ -98,6 +104,8 @@ class JackpotChampionshipController extends ChangeNotifier {
 
       return null;
     }, (newChampionshipJackpots) async {
+      await _getAllAwards();
+
       _championshipPreviewJackpots = newChampionshipJackpots;
 
       final calls = _championshipPreviewJackpots
@@ -107,7 +115,7 @@ class JackpotChampionshipController extends ChangeNotifier {
           .toList();
       final responses = await Future.wait(calls);
       final newJacks = responses.where((item) => item != null).toList();
-      _championshipCompleteJackpots = List<JackpotEntity>.from(newJacks);
+      _championshipCompleteJackpots = List<SportJackpotEntity>.from(newJacks);
       filterTeams.clear();
       for (var element in _championshipCompleteJackpots) {
         final bool contain =
@@ -117,9 +125,26 @@ class JackpotChampionshipController extends ChangeNotifier {
         }
       }
       _allChampionshipCompleteJackpots = [..._championshipCompleteJackpots];
+      if (_allAwards.isNotEmpty) {
+        for (var jack in _allChampionshipCompleteJackpots) {
+          final awards = jack.awardsId!
+              .map((id) => _allAwards.firstWhere((award) => award.id == id))
+              .toList();
+          jack.awards = awards;
+        }
+      }
       setLoading(value: false);
 
       return;
+    });
+  }
+
+  Future<void> _getAllAwards() async {
+    final response = await fetchAllAwardsUsecase();
+    response.fold((exception) {
+      _allAwards = [];
+    }, (newAwards) async {
+      _allAwards = newAwards;
     });
   }
 
@@ -148,7 +173,7 @@ class JackpotChampionshipController extends ChangeNotifier {
     final handledTeams = filterTeams
         .where((team) => team.name.toLowerCase().contains(content))
         .toList();
-    final List<JackpotEntity> tempList = [];
+    final List<SportJackpotEntity> tempList = [];
     for (var team in handledTeams) {
       final filteredJack = allChampionshipCompleteJackpots
           .firstWhere((champ) => champ.jackpotOwnerTeam.id == team.id);

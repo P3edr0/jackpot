@@ -63,6 +63,7 @@ class PaymentController extends ChangeNotifier {
   String? _exception;
   String? _userName;
   String? _cardPaymentId;
+  String? _tempBetPaymentId;
   String? _encryptedCard;
   String? _email;
   String? _phone;
@@ -86,9 +87,11 @@ class PaymentController extends ChangeNotifier {
   //////////////////////// GETS //////////////////////////////
   int? get couponsQuantity => _couponsQuantity;
   String? get exception => _exception;
+  String get userDocument => _userDocument ?? quickPurchaseUser!.document;
   String? get encryptedCard => _encryptedCard;
   String? get itemDescription => _itemDescription;
   String? get cardPaymentId => _cardPaymentId;
+  String? get tempBetPaymentId => _tempBetPaymentId;
   Widget? get pageContent => _pageContent;
   GlobalKey<FormState> get formKey => _formKey;
   GlobalKey<FormState> get cardFormKey => _cardFormKey;
@@ -109,7 +112,9 @@ class PaymentController extends ChangeNotifier {
   TextEditingController get complementController => _complementController;
   TextEditingController get cityController => _cityController;
   TextEditingController get stateController => _stateController;
-  String get paymentId => _paymentType.isPix ? _pix!.id : cardPaymentId!;
+  String? get paymentId => _paymentType.isPix
+      ? (_pix?.id ?? _tempBetPaymentId)
+      : (cardPaymentId ?? _tempBetPaymentId);
   TextEditingController get neighborhoodController => _neighborhoodController;
   TextEditingController get streetController => _streetController;
   TextEditingController get numberController => _numberController;
@@ -172,6 +177,11 @@ class PaymentController extends ChangeNotifier {
 
   setPageContent(Widget newContent) {
     _pageContent = newContent;
+    notifyListeners();
+  }
+
+  setTempPaymentId(String newPaymentId) {
+    _tempBetPaymentId = newPaymentId;
     notifyListeners();
   }
 
@@ -394,6 +404,15 @@ class PaymentController extends ChangeNotifier {
         itemQuantity: _paymentCouponsQuantity!,
         itemUnitValue: _unitValue!);
 
+    // return Future.delayed(
+    //   Durations.extralong4,
+    //   () => PixEntity(
+    //       id: 'cf673550-ae41-4060-8d57-e3d930600bb8',
+    //       value: 6.99,
+    //       qrCode: '',
+    //       copyPaste: '',
+    //       expireAt: DateTime(2026)),
+    // );
     final response = await getPixUsecase(order);
 
     return response.fold(

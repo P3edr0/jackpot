@@ -13,6 +13,7 @@ class PixController extends ChangeNotifier {
   bool _hasError = false;
   PixEntity? _pix;
   Timer? _pixTimer;
+  Timer? _expirePixTimer;
   PaymentStatus _pixStatus = PaymentStatus.waiting;
 
   ///////////////// GET ///////////////////////
@@ -57,22 +58,28 @@ class PixController extends ChangeNotifier {
         notifyListeners();
       },
       (success) {
-        _pixStatus = PaymentStatus.success;
-        log('Pagamento feito com sucesso');
+        _pixStatus = success;
+        log('Verificando status do PIX - ${success.getLabel()}');
         notifyListeners();
       },
     );
   }
 
   startPixTimer() {
-    cancelTimer();
-    _pixTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+    cancelTimers();
+
+    _expirePixTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      notifyListeners();
+    });
+
+    _pixTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
       _pixStatus = PaymentStatus.waiting;
       await verifyPixStatus();
     });
   }
 
-  void saveOrder() {}
-
-  void cancelTimer() => _pixTimer?.cancel();
+  void cancelTimers() {
+    _pixTimer?.cancel();
+    _expirePixTimer?.cancel();
+  }
 }

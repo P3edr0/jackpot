@@ -1,13 +1,15 @@
 import 'package:dartz/dartz.dart';
 import 'package:jackpot/domain/entities/bet_entity.dart';
 import 'package:jackpot/domain/entities/championship_entity.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
+import 'package:jackpot/domain/entities/extra_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/preview_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/team_entity.dart';
+import 'package:jackpot/domain/entities/temporary_bet_entity.dart';
 import 'package:jackpot/domain/exceptions/auth_exceptions.dart';
 
 abstract class IGetJackpotRepository {
-  Future<Either<IJackExceptions, JackpotEntity>> call(String jackpotId);
+  Future<Either<IJackExceptions, SportJackpotEntity>> call(String jackpotId);
 }
 
 abstract class IFetchAllTeamJackpotRepository {
@@ -30,4 +32,23 @@ abstract class IGroupByChampionshipJackpotRepository {
 
 abstract class ICreateBetRepository {
   Future<Either<IJackExceptions, bool>> call(BetEntity bet);
+}
+
+abstract class IUpdateTempBetRepository {
+  Future<Either<IJackExceptions, bool>> call(List<TemporaryBetEntity> tempBets);
+}
+
+abstract class IGetTempBetRepository {
+  Future<Either<IJackExceptions, List<TemporaryBetEntity>>> call(
+      String userDocument);
+}
+
+abstract class IDeleteTempBetRepository {
+  Future<Either<IJackExceptions, bool>> call(
+      String userDocument, String paymentId);
+}
+///////////////////////// EXTRA ///////////////////////////////
+
+abstract class IFetchExtraJackpotRepository {
+  Future<Either<IJackExceptions, List<ExtraJackpotEntity>>> call();
 }

@@ -1,38 +1,27 @@
-import 'package:jackpot/domain/entities/question_entity.dart';
-import 'package:jackpot/domain/entities/resume_championship_entity.dart';
-import 'package:jackpot/domain/entities/team_entity.dart';
+import 'package:jackpot/domain/entities/award_entity.dart';
+import 'package:jackpot/shared/utils/enums/jackpot_type.dart';
 
 class JackpotEntity {
-  JackpotEntity({
-    required this.id,
-    required this.betId,
-    required this.championship,
-    required this.banner,
-    required this.potValue,
-    required this.endAt,
-    required this.matchTime,
-    required this.budgetValue,
-    required this.awardsId,
-    required this.description,
-    required this.questionId,
-    required this.homeTeam,
-    required this.visitorTeam,
-    required this.jackpotOwnerTeam,
-    required this.questions,
-  });
-  ResumeChampionshipEntity championship;
+  JackpotEntity(
+      {required this.id,
+      this.betId,
+      required this.banner,
+      this.potValue,
+      required this.endAt,
+      required this.budgetValue,
+      this.awardsId,
+      this.awards,
+      required this.description,
+      required this.jackpotType});
   String id;
-  String betId;
+  String? betId;
   String banner;
-  String potValue;
+  String? potValue;
   DateTime endAt;
-  DateTime matchTime;
   String budgetValue;
-  String questionId;
-  TeamEntity homeTeam;
-  TeamEntity visitorTeam;
-  TeamEntity jackpotOwnerTeam;
+
   String description;
-  List<String> awardsId;
-  QuestionEntity questions;
+  List<String>? awardsId;
+  List<AwardEntity>? awards;
+  JackpotType jackpotType;
 }

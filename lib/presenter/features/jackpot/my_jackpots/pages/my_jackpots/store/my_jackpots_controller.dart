@@ -1,27 +1,37 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:jackpot/domain/entities/award_entity.dart';
 import 'package:jackpot/domain/entities/bet_made_entity.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/temporary_bet_entity.dart';
+import 'package:jackpot/domain/usecases/award/fetch_all_awards_usecase.dart';
 import 'package:jackpot/domain/usecases/bet/get_bet_made_usecase.dart';
+import 'package:jackpot/domain/usecases/jackpot/bet/get_temp_bets_usecase.dart';
 import 'package:jackpot/domain/usecases/jackpot/get_jackpot_usecase.dart';
 import 'package:jackpot/domain/usecases/jackpot/list_by_team_jackpot_usecase.dart';
 import 'package:jackpot/shared/utils/enums/jack_filters_type.dart';
 
 class MyJackpotsController extends ChangeNotifier {
-  MyJackpotsController({
-    required this.getJackpotUsecase,
-    required this.listByTeamJackpotUsecase,
-    required this.getBetMadeUsecase,
-  });
+  MyJackpotsController(
+      {required this.getJackpotUsecase,
+      required this.listByTeamJackpotUsecase,
+      required this.getBetMadeUsecase,
+      required this.getTempBetsUsecase,
+      required this.fetchAllAwardsUsecase});
   final GetJackpotUsecase getJackpotUsecase;
   final ListByTeamJackpotUsecase listByTeamJackpotUsecase;
   final GetBetMadeUsecase getBetMadeUsecase;
+  final FetchAllAwardsUsecase fetchAllAwardsUsecase;
+  final GetTempBetsUsecase getTempBetsUsecase;
 
   //////////////////////// VARS //////////////////////////////
   String? _exception;
-
+  List<AwardEntity> _allAwards = [];
   bool isLoading = false;
-  List<JackpotEntity> betJackpots = [];
+  List<SportJackpotEntity> betJackpots = [];
   List<BetMadeEntity> _userBets = [];
+  List<TemporaryBetEntity> _recoveredTemporaryBets = [];
 
   JackFiltersType _jackFiltersType = JackFiltersType.all;
 
@@ -32,8 +42,10 @@ class MyJackpotsController extends ChangeNotifier {
   String? get exception => _exception;
   bool get hasError => exception != null;
   List<BetMadeEntity> get userBets => _userBets;
+  List<TemporaryBetEntity> get recoveredTemporaryBets =>
+      _recoveredTemporaryBets;
 
-  List<BetMadeEntity> getUserSelectedJackpotBets(JackpotEntity jackpot) {
+  List<BetMadeEntity> getUserSelectedJackpotBets(SportJackpotEntity jackpot) {
     final jackId = jackpot.id;
     final handledBets =
         _userBets.where((bet) => bet.jackpotId == jackId).toList();
@@ -53,7 +65,7 @@ class MyJackpotsController extends ChangeNotifier {
   }
 
   //////////////////////// FUNCTIONS //////////////////////////////
-  Future<JackpotEntity?> getJackpot(String selectedJackpotId) async {
+  Future<SportJackpotEntity?> getJackpot(String selectedJackpotId) async {
     setLoading(value: true);
     final response = await getJackpotUsecase(selectedJackpotId);
 
@@ -79,6 +91,7 @@ class MyJackpotsController extends ChangeNotifier {
         notifyListeners();
       },
       (bets) {
+        _exception = null;
         _userBets = bets;
         notifyListeners();
       },
@@ -88,19 +101,31 @@ class MyJackpotsController extends ChangeNotifier {
 
       return;
     }
+    final tempBetResponse = await getTempBetsUsecase(userDocument);
+    tempBetResponse.fold((l) {
+      log("Falha ao recuperar as Bets temporarias.");
+    }, (newTemporaryBets) {
+      _recoveredTemporaryBets = newTemporaryBets;
 
-    final jackIds = userBets.map((bet) => bet.jackpotId).toList();
-
+      log("Bets salvas temporariamente com sucesso");
+      notifyListeners();
+    });
+    final Set<String> jackIds = userBets.map((bet) => bet.jackpotId!).toSet();
+    final tempJackpotsIds =
+        _recoveredTemporaryBets.map((tempBet) => tempBet.jackpotId).toSet();
+    jackIds.addAll(tempJackpotsIds);
     final jacksCalls =
-        jackIds.map((newJackId) => getJackpotUsecase(newJackId!)).toList();
+        jackIds.map((newJackId) => getJackpotUsecase(newJackId)).toList();
 
     final responses = await Future.wait(jacksCalls);
-
+    await _getAllAwards();
     for (var response in responses) {
       response.fold((error) {
         _exception = error.message;
         notifyListeners();
-      }, (jack) {
+      }, (jack) async {
+        _exception = null;
+
         bool added = false;
 
         for (var item in betJackpots) {
@@ -111,7 +136,32 @@ class MyJackpotsController extends ChangeNotifier {
         if (!added) betJackpots.add(jack);
       });
     }
+    if (_allAwards.isNotEmpty) {
+      for (var jack in betJackpots) {
+        final awards = jack.awardsId!
+            .map((id) => _allAwards.firstWhere((award) => award.id == id))
+            .toList();
+        jack.awards = awards;
+      }
+    }
     setLoading(value: false);
+  }
+
+  List<TemporaryBetEntity> getSelectedTempBets(String jackpotId) {
+    final selectedTempBets = _recoveredTemporaryBets
+        .where((item) => item.jackpotId == jackpotId)
+        .toList();
+
+    return selectedTempBets;
+  }
+
+  Future<void> _getAllAwards() async {
+    final response = await fetchAllAwardsUsecase();
+    response.fold((exception) {
+      _allAwards = [];
+    }, (newAwards) async {
+      _allAwards = newAwards;
+    });
   }
 
   void setJackFiltersType(JackFiltersType filterType) {

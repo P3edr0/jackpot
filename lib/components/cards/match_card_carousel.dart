@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:jackpot/components/buttons/rounded_button.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
 import 'package:jackpot/shared/utils/formatters/date_formatter.dart';
@@ -16,7 +16,7 @@ class MatchCardCarousel extends StatefulWidget {
   });
   final BoxConstraints constraints;
 
-  final List<JackpotEntity> jackpots;
+  final List<SportJackpotEntity> jackpots;
 
   @override
   State<MatchCardCarousel> createState() => _MatchCardCarouselState();
