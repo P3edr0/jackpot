@@ -5,8 +5,8 @@ import 'package:jackpot/components/buttons/outline_button.dart';
 import 'package:jackpot/components/buttons/selectable_rounded_button.dart';
 import 'package:jackpot/components/cards/small_item_shopping_card.dart';
 import 'package:jackpot/components/loadings/loading.dart';
+import 'package:jackpot/domain/entities/award_entity.dart';
 import 'package:jackpot/domain/entities/shopping_cart_jackpot_entity.dart';
-import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/temporary_bet_entity.dart';
 import 'package:jackpot/presenter/features/home/pages/home/widgets/bottom_navigation_bar.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_questions/store/jackpot_questions_controller.dart';
@@ -31,14 +31,21 @@ class ShoppingCartPage extends StatefulWidget {
 
 class _ShoppingCartPageState extends State<ShoppingCartPage> {
   late ShoppingCartController controller;
-  // late JackpotController jackController;
 
   @override
   void initState() {
     super.initState();
     controller = Provider.of<ShoppingCartController>(context, listen: false);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {});
+    final jackpotController =
+        Provider.of<JackpotController>(context, listen: false);
+    List<AwardEntity> awards = jackpotController.allAwards;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (awards.isEmpty) {
+        await jackpotController.getAllAwards();
+        awards = jackpotController.allAwards;
+      }
+      controller.updateItemsAwards(awards);
+    });
   }
 
   @override
@@ -136,8 +143,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                                                 child: SmallItemShoppingCard(
                                                   onTap: () {
                                                     final handledSportsJack =
-                                                        jack.jackpot
-                                                            as SportJackpotEntity;
+                                                        jack.jackpot;
                                                     final paymentController =
                                                         Provider.of<
                                                                 PaymentController>(
@@ -230,8 +236,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                                         borderWidth: 2,
                                         onTap: () {
                                           final jacks = controller.cartItems
-                                              .map((item) => item.jackpot
-                                                  as SportJackpotEntity)
+                                              .map((item) => item.jackpot)
                                               .toList();
                                           final paymentController =
                                               Provider.of<PaymentController>(

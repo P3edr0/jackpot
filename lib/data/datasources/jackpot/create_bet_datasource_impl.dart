@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:curl_logger_dio_interceptor/curl_logger_dio_interceptor.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/bet/create_bet_datasource.dart';
@@ -13,6 +14,7 @@ class CreateBetDatasourceImpl implements ICreateBetDatasource {
   Future<Either<IJackExceptions, bool>> call(BetEntity bet) async {
     final dio = Dio();
     final body = BetEntityMapper.toJson(bet);
+    dio.interceptors.add(CurlLoggerDioInterceptor(printOnSuccess: true));
 
     try {
       await dio.post('${JackEnvironment.apiUrl}betmade',

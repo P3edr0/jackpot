@@ -35,8 +35,8 @@ class DeleteTempBetRepositoryImpl implements IDeleteTempBetRepository {
 
   @override
   Future<Either<IJackExceptions, bool>> call(
-      String userDocument, String paymentId) async {
-    final response = await datasource(userDocument, paymentId);
+      String userDocument, String paymentId, String jackpotId) async {
+    final response = await datasource(userDocument, paymentId, jackpotId);
     return response;
   }
 }

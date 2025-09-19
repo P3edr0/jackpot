@@ -22,6 +22,7 @@ import 'package:jackpot/responsiveness/responsive.dart';
 import 'package:jackpot/shared/utils/app_assets.dart';
 import 'package:jackpot/shared/utils/enums/bet_filters.dart';
 import 'package:jackpot/shared/utils/routes/app_routes.dart';
+import 'package:jackpot/shared/utils/routes/route_observer.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../../theme/colors.dart';
@@ -33,15 +34,24 @@ class MyJackpotsDetailsPage extends StatefulWidget {
   State<MyJackpotsDetailsPage> createState() => _MyJackpotsDetailsPageState();
 }
 
-class _MyJackpotsDetailsPageState extends State<MyJackpotsDetailsPage> {
+class _MyJackpotsDetailsPageState extends State<MyJackpotsDetailsPage>
+    with RouteAware {
   late MyJackpotsDetailsController controller;
+  final routeObserver = RouteStackObserver.instance();
+
   @override
   void initState() {
     super.initState();
     controller =
         Provider.of<MyJackpotsDetailsController>(context, listen: false);
-
-    controller.groupLists();
+    final myJackpotscontroller =
+        Provider.of<MyJackpotsController>(context, listen: false);
+    final currentFilter = myJackpotscontroller.betStatusFilter;
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        controller.setBetStatusFilter(currentFilter);
+      },
+    );
   }
 
   @override
@@ -237,6 +247,9 @@ class _MyJackpotsDetailsPageState extends State<MyJackpotsDetailsPage> {
                                                                   PixController>(
                                                               context,
                                                               listen: false);
+                                                      pixController
+                                                          .setIsPixPreview(
+                                                              true);
 
                                                       final tempBet =
                                                           bet.temporaryBet!;
@@ -248,7 +261,9 @@ class _MyJackpotsDetailsPageState extends State<MyJackpotsDetailsPage> {
                                                       final newPix = PixEntity(
                                                           id: tempBet
                                                               .paymentId!,
-                                                          value: paymentValue,
+                                                          value: tempBet
+                                                                  .paymentValue ??
+                                                              paymentValue,
                                                           qrCode: tempBet
                                                               .pixQrCode!,
                                                           expireAt: tempBet

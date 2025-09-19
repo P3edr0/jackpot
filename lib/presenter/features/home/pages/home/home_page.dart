@@ -14,7 +14,6 @@ import 'package:jackpot/presenter/features/home/pages/home/widgets/tabs.dart';
 import 'package:jackpot/presenter/features/shopping_cart/store/shopping_cart_controller.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
-import 'package:jackpot/shared/utils/enums/tab_navigation_options.dart';
 import 'package:jackpot/shared/utils/routes/app_routes.dart';
 import 'package:provider/provider.dart';
 
@@ -37,10 +36,6 @@ class _HomePageState extends State<HomePage> {
 
     controller = Provider.of<HomeController>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!controller.selectedTabNavigationOption.isHome) {
-        controller.setSelectedJackNavbarTab(JackTabNavigationOptions.home);
-        Navigator.pushNamed(context, AppRoutes.home);
-      }
       await controller.startHomePage();
     });
   }
@@ -48,7 +43,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        bottomNavigationBar: const JackBottomNavigationBar(),
+        bottomNavigationBar: Selector<HomeController, bool>(
+            selector: (context, controller) => controller.isLoading,
+            builder: (context, isLoading, child) =>
+                isLoading ? const SizedBox() : const JackBottomNavigationBar()),
         body: PopScope(
           canPop: false,
           onPopInvokedWithResult: (bool didPop, Object? result) async {
@@ -139,10 +137,13 @@ class _HomePageState extends State<HomePage> {
                                                                     radius: Responsive
                                                                         .getHeightValue(
                                                                             24),
-                                                                    backgroundImage:
-                                                                        NetworkImage(coreController
-                                                                            .currentSession!
-                                                                            .image),
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .lock_outline,
+                                                                      size: Responsive
+                                                                          .getHeightValue(
+                                                                              30),
+                                                                    ),
                                                                   ),
                                                                 )
                                                               : JackOutlineButton(

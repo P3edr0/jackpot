@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
+import 'package:jackpot/domain/entities/award_entity.dart';
 import 'package:jackpot/domain/entities/shopping_cart_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/domain/exceptions/auth_exceptions.dart';
@@ -23,7 +23,7 @@ class ShoppingCartController extends ChangeNotifier {
   List<JackpotAggregateEntity> get cartItems => _cartItems;
   bool get loading => _loading;
   ////////////////// FUNCTIONS /////////////////////////
-  addShoppingCartItem(JackpotEntity jackpot, int couponsQuantity,
+  addShoppingCartItem(SportJackpotEntity jackpot, int couponsQuantity,
       double couponsPrice, String? uzerId) {
     final newJackpot = JackpotAggregateEntity(
         jackpot: jackpot,
@@ -39,6 +39,16 @@ class ShoppingCartController extends ChangeNotifier {
     if (!added) cartItems.add(newJackpot);
     saveLocalCart(uzerId);
     sumCoupons();
+  }
+
+  void updateItemsAwards(List<AwardEntity> awards) {
+    for (var item in _cartItems) {
+      final jackpotAwards = awards
+          .where((award) => item.jackpot.awardsId!.contains(award.id))
+          .toList();
+      item.jackpot.awards = jackpotAwards;
+    }
+    notifyListeners();
   }
 
   saveLocalCart(
@@ -92,7 +102,10 @@ class ShoppingCartController extends ChangeNotifier {
         tempList.add(newItem);
       });
     }
-    _cartItems = [...tempList];
+    final items = tempList
+        .where((item) => DateTime.now().isBefore(item.jackpot.endAt))
+        .toList();
+    _cartItems = [...items];
     sumCoupons();
     notifyListeners();
   }

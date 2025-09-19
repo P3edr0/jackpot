@@ -25,7 +25,6 @@ class SecureStorageUpdateTempBet implements IUpdateTempBetDatasource {
         await storage.write(key: key, value: data);
         return const Right(true);
       } else {
-        // if (oldContent.startsWith('{[') && oldContent.endsWith(']}')) {
         final withoutBraces = oldContent.substring(1, oldContent.length - 1);
         final jsonString = withoutBraces;
 
@@ -35,7 +34,8 @@ class SecureStorageUpdateTempBet implements IUpdateTempBetDatasource {
             .toList();
         for (var newTempBet in tempBets) {
           for (var oldTempBet in temporaryBets) {
-            if (newTempBet.paymentId == oldTempBet.paymentId) {
+            if (newTempBet.paymentId == oldTempBet.paymentId &&
+                newTempBet.jackpotId == oldTempBet.jackpotId) {
               oldTempBet.status = newTempBet.status;
               newTempBet.paymentId = null;
             }
@@ -49,7 +49,6 @@ class SecureStorageUpdateTempBet implements IUpdateTempBetDatasource {
         final data = '{$handledBets}';
         await storage.write(key: key, value: data);
         return const Right(true);
-        // }
       }
     } catch (e) {
       log(e.toString());

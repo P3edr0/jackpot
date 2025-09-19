@@ -1,7 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:jackpot/components/buttons/rounded_button.dart';
+import 'package:jackpot/components/image.dart';
 import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
@@ -97,16 +96,10 @@ class _MatchCardCarouselState extends State<MatchCardCarousel> {
                           children: [
                             Column(
                               children: [
-                                Image.network(
-                                  widget.jackpots[currentCard].homeTeam.logo,
+                                JackImage(
+                                  image: widget
+                                      .jackpots[currentCard].homeTeam.logo,
                                   height: 60,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Image.memory(
-                                          base64Decode(widget
-                                              .jackpots[currentCard]
-                                              .homeTeam
-                                              .logo),
-                                          height: 60),
                                 ),
                                 SizedBox(
                                   height: Responsive.getHeightValue(6),
@@ -125,16 +118,10 @@ class _MatchCardCarouselState extends State<MatchCardCarousel> {
                             ),
                             Column(
                               children: [
-                                Image.network(
-                                  widget.jackpots[currentCard].visitorTeam.logo,
+                                JackImage(
+                                  image: widget
+                                      .jackpots[currentCard].visitorTeam.logo,
                                   height: 60,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Image.memory(
-                                          base64Decode(widget
-                                              .jackpots[currentCard]
-                                              .visitorTeam
-                                              .logo),
-                                          height: 60),
                                 ),
                                 SizedBox(
                                   height: Responsive.getHeightValue(6),

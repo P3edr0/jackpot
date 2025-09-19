@@ -67,7 +67,6 @@ class HomeController extends ChangeNotifier {
   Future<void> startHomePage() async {
     setLoading();
     await Future.wait([
-      fetchAllJacks(false),
       fetchAllTeams(false),
       fetchExtraJackpots(false),
       fetchAllChampionships(false),
@@ -108,18 +107,6 @@ class HomeController extends ChangeNotifier {
     favoriteChampionships.clear();
     for (var i = 0; i < count; i++) {
       _favoriteChampionships.add(false);
-    }
-  }
-
-  Future<void> fetchAllJacks([needLoading = true]) async {
-    //TODO: CORRIGIR IMPLEMENTAÇÂO
-    try {
-      if (needLoading) setLoading();
-      // final tempJacks = await TempRequests.fetchAllJacks();
-      // _extraJacks = tempJacks;
-      if (needLoading) setLoading();
-    } catch (e) {
-      if (needLoading) setLoading();
     }
   }
 

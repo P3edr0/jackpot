@@ -11,6 +11,7 @@ class PixController extends ChangeNotifier {
   GetPixStatusUsecase getPixStatusUsecase;
   bool _isLoading = false;
   bool _hasError = false;
+  bool _isPixPreview = false;
   PixEntity? _pix;
   Timer? _pixTimer;
   Timer? _expirePixTimer;
@@ -19,10 +20,16 @@ class PixController extends ChangeNotifier {
   ///////////////// GET ///////////////////////
   bool get isLoading => _isLoading;
   bool get hasError => _hasError;
+  bool get isPixPreview => _isPixPreview;
   PixEntity? get pix => _pix;
   PaymentStatus? get pixStatus => _pixStatus;
 
   ///////////////// SET ///////////////////////
+
+  void setIsPixPreview(bool newPixPreview) {
+    _isPixPreview = newPixPreview;
+  }
+
   void setLoading([bool? newLoading]) {
     if (newLoading != null) {
       _isLoading = newLoading;
@@ -41,6 +48,7 @@ class PixController extends ChangeNotifier {
       return;
     }
     _pix = newPix;
+
     if (_pixTimer == null) {
       startPixTimer();
     } else {
@@ -50,6 +58,7 @@ class PixController extends ChangeNotifier {
   }
 
   Future<void> verifyPixStatus() async {
+    if (pix == null) return;
     final id = pix!.id;
     final response = await getPixStatusUsecase(id);
     response.fold(

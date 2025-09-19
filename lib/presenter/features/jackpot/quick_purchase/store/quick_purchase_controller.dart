@@ -43,6 +43,7 @@ class QuickPurchaseController extends ChangeNotifier {
     setLoading();
 
     final response = await countryUsecase();
+    exception = null;
 
     return response.fold((error) {
       exception = error.message;
@@ -55,6 +56,8 @@ class QuickPurchaseController extends ChangeNotifier {
   }
 
   Future<void> checkDocument() async {
+    exception = null;
+
     String document = documentController.text.replaceAll(RegExp('[.-]+'), '');
 
     final response =
@@ -67,7 +70,7 @@ class QuickPurchaseController extends ChangeNotifier {
       return null;
     }, (user) {
       if (user.haveProfile!) {
-        exception = "O documento inserido já está cadastrado.";
+        exception = "haveRegister";
         documentController.clear();
         notifyListeners();
         return null;

@@ -76,8 +76,8 @@ class _QuickPurchasePageState extends State<QuickPurchasePage>
                         height: Responsive.getHeightValue(16),
                       ),
                       Selector<JackpotController, List<SportJackpotEntity>>(
-                          selector: (context, controller) => controller
-                              .selectedJackpot! as List<SportJackpotEntity>,
+                          selector: (context, controller) =>
+                              controller.selectedSportsJackpot!,
                           builder: (context, jackpots, child) => Padding(
                                 padding: EdgeInsets.only(
                                     bottom: Responsive.getHeightValue(16)),
@@ -134,6 +134,29 @@ class _QuickPurchasePageState extends State<QuickPurchasePage>
                                   if (value.length == 14) {
                                     await controller.checkDocument();
                                     if (controller.hasError) {
+                                      if (controller.exception ==
+                                          'haveRegister') {
+                                        String document = value.replaceAll(
+                                            RegExp('[.-]+'), '');
+
+                                        final coreController =
+                                            Provider.of<CoreController>(context,
+                                                listen: false);
+                                        coreController
+                                            .setComingFromPayment(true);
+                                        if (coreController.haveSession &&
+                                            coreController.currentSession!
+                                                    .credential ==
+                                                document &&
+                                            context.mounted) {
+                                          Navigator.pushNamed(context,
+                                              AppRoutes.recoverySession);
+                                          return;
+                                        }
+                                        Navigator.pushNamed(
+                                            context, AppRoutes.login);
+                                        return;
+                                      }
                                       ErrorDialog.show("Erro",
                                           controller.exception!, context);
                                     }

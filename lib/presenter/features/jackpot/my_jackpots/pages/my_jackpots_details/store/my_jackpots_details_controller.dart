@@ -105,11 +105,6 @@ class MyJackpotsDetailsController extends ChangeNotifier {
 
   //////////////////////// FUNCTIONS //////////////////////////////
 
-  void groupLists() {
-    _allUserBets = [..._tempHandledBets, ..._allUserBets];
-    setBetStatusFilter();
-  }
-
   Future<SportJackpotEntity?> getJackpot(String selectedJackpotId) async {
     setLoading(value: true);
     final response = await getJackpotUsecase(selectedJackpotId);

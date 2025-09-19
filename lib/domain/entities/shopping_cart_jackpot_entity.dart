@@ -1,4 +1,4 @@
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 
 class JackpotAggregateEntity {
   JackpotAggregateEntity({
@@ -6,7 +6,7 @@ class JackpotAggregateEntity {
     required this.couponsQuantity,
     required this.couponPrice,
   });
-  JackpotEntity jackpot;
+  SportJackpotEntity jackpot;
   int couponsQuantity;
   double couponPrice;
 }

@@ -52,7 +52,13 @@ class JackpotQuestionsController extends ChangeNotifier {
     _acceptTerms = false;
   }
 
-  setLoading() {
+  setLoading([bool? newLoading]) {
+    if (newLoading != null) {
+      _isLoading = newLoading;
+
+      notifyListeners();
+      return;
+    }
     _isLoading = !_isLoading;
     notifyListeners();
   }
@@ -155,18 +161,11 @@ class JackpotQuestionsController extends ChangeNotifier {
       {required List<JackpotAggregateEntity> newJackpots,
       required List<BetQuestionReviewEntity> betAnswers,
       bool isPreview = false}) {
-    final currentJackpot = newJackpots.first;
-    if (currentJackpot.jackpot.id == _selectedJackpot?.id &&
-        currentJackpot.couponsQuantity == _couponsQuantity &&
-        !isPreview) {
-      return;
-    }
-
     if (!isPreview) {
       _betQueue = [...newJackpots];
     }
     _currentQuestionPage = 1;
-    _selectedJackpot = newJackpots.first.jackpot as SportJackpotEntity;
+    _selectedJackpot = newJackpots.first.jackpot;
     _couponsQuantity = newJackpots.first.couponsQuantity;
     checkIsLastPage();
     _completedQuestions = 0;

@@ -16,26 +16,26 @@ class ConfirmDialog {
               title: Text(title, textAlign: TextAlign.center),
               content: Text(content, textAlign: TextAlign.center),
               actions: [
-                JackRoundedButton(
+                JackOutlineButton(
                   height: 50,
-                  width: Responsive.getHeightValue(110),
+                  width: Responsive.getHeightValue(120),
                   onTap: () => Navigator.of(context).pop(),
+                  borderColor: darkBlue,
                   child: Text(
                     "Voltar",
                     textAlign: TextAlign.center,
-                    style:
-                        JackFontStyle.titleBold.copyWith(color: secondaryColor),
+                    style: JackFontStyle.titleBold.copyWith(color: darkBlue),
                   ),
                 ),
-                JackOutlineButton(
+                JackRoundedButton(
                   height: 50,
-                  width: Responsive.getHeightValue(130),
+                  width: Responsive.getHeightValue(150),
                   onTap: confirmCallback,
-                  borderColor: darkBlue,
                   child: Text(
                     "Confirmar",
                     textAlign: TextAlign.center,
-                    style: JackFontStyle.titleBold.copyWith(color: darkBlue),
+                    style:
+                        JackFontStyle.titleBold.copyWith(color: secondaryColor),
                   ),
                 ),
               ],

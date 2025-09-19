@@ -22,7 +22,8 @@ class CardPaymentDatasourceImpl implements ICardPaymentDatasource {
               data: json.encode(body),
               options: Options(
                 headers: {
-                  "Content-type": "application/json; charset=UTF-8",
+                  "accept": "text/plain",
+                  "Content-type": "application/json-patch+json",
                   'x-api-key': JackEnvironment.paymentApiKey
                 },
               ));

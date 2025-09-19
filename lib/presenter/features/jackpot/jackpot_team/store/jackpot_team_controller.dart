@@ -73,7 +73,7 @@ class JackpotTeamController extends ChangeNotifier {
     });
   }
 
-  Future<void> getTeamJackpots() async {
+  Future<void> getTeamJackpots(List<AwardEntity> newAllAwards) async {
     setLoading(value: true);
     final response = await listByTeamJackpotUsecase(_selectedTeamId);
 
@@ -82,7 +82,13 @@ class JackpotTeamController extends ChangeNotifier {
 
       return null;
     }, (newTeamJackpots) async {
-      await _getAllAwards();
+      if (_allAwards.isEmpty) {
+        if (newAllAwards.isNotEmpty) {
+          _allAwards = [...newAllAwards];
+        } else {
+          await _getAllAwards();
+        }
+      }
 
       _teamPreviewJackpots = newTeamJackpots;
       final calls = _teamPreviewJackpots

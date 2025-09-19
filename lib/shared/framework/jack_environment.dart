@@ -12,9 +12,7 @@ abstract class JackEnvironment {
   static const paymentApiKey = String.fromEnvironment(
     'payment_api_key',
   );
-  static const paymentExternalApi = String.fromEnvironment(
-    'payment_external_api',
-  );
+
   static const paymentExternalToken = String.fromEnvironment(
     'payment_external_token',
   );

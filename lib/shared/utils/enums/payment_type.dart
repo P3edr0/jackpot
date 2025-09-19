@@ -13,9 +13,9 @@ enum PaymentType {
         case pix:
           return 'PIX';
         case creditCard:
-          return 'credit-card';
+          return 'Credito';
         default:
-          return 'debit-card';
+          return 'Debito';
       }
     }
   }

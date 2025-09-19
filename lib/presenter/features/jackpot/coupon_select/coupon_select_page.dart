@@ -217,7 +217,7 @@ class _CouponSelectPageState extends State<CouponSelectPage>
                                             context,
                                             listen: false);
                                     final jackpot =
-                                        jackController.selectedJackpot;
+                                        jackController.selectedSportsJackpot;
                                     final handledJackpot =
                                         JackpotAggregateEntity(
                                             couponPrice: 00,
@@ -486,7 +486,7 @@ class _CouponSelectPageState extends State<CouponSelectPage>
                                   borderWidth: 2,
                                   onTap: () {
                                     final jackpot =
-                                        jackController.selectedJackpot!;
+                                        jackController.selectedSportsJackpot!;
                                     final couponsQuantity =
                                         controller.couponsQuantity;
                                     final couponsPrice = controller.couponPrice;
@@ -542,9 +542,10 @@ class _CouponSelectPageState extends State<CouponSelectPage>
                                     }).toList();
 
                                     final newTemporaryBet = TemporaryBetEntity(
-                                        couponQuantity: couponsQuantity,
-                                        jackpotId: jackpot.first!.id,
-                                        couponPrice: controller.couponPrice);
+                                      couponQuantity: couponsQuantity,
+                                      jackpotId: jackpot.first!.id,
+                                      couponPrice: controller.couponPrice,
+                                    );
 
                                     jackController
                                         .setTemporaryBets([newTemporaryBet]);

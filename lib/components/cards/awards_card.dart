@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:jackpot/components/buttons/rounded_button.dart';
+import 'package:jackpot/components/image.dart';
 import 'package:jackpot/domain/entities/award_entity.dart';
 import 'package:jackpot/domain/entities/team_entity.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
@@ -146,12 +147,9 @@ class AwardsCard extends StatelessWidget {
                       Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Image.network(
-                              homeTeam.logo,
+                            JackImage(
+                              image: homeTeam.logo,
                               height: 40,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Image.memory(base64Decode(homeTeam.logo),
-                                      height: 40),
                             ),
                             SizedBox(
                               width: Responsive.getHeightValue(5),
@@ -164,12 +162,9 @@ class AwardsCard extends StatelessWidget {
                             SizedBox(
                               width: Responsive.getHeightValue(5),
                             ),
-                            Image.network(
-                              visitTeam.logo,
+                            JackImage(
+                              image: visitTeam.logo,
                               height: 40,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Image.memory(base64Decode(visitTeam.logo),
-                                      height: 40),
                             ),
                             const Spacer(),
                             Text(JackDateFormat.eventTimeFormat(date),

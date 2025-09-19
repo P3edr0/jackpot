@@ -3,6 +3,7 @@ import 'package:jackpot/domain/entities/bet_entity.dart';
 import 'package:jackpot/domain/entities/championship_entity.dart';
 import 'package:jackpot/domain/entities/extra_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/preview_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/resume_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/team_entity.dart';
 import 'package:jackpot/domain/entities/temporary_bet_entity.dart';
@@ -26,6 +27,10 @@ abstract class IListByChampionshipJackpotRepository {
       String championshipId);
 }
 
+abstract class IFetchAllResumeJackpotRepository {
+  Future<Either<IJackExceptions, List<ResumeJackpotEntity>>> call();
+}
+
 abstract class IGroupByChampionshipJackpotRepository {
   Future<Either<IJackExceptions, List<ChampionshipEntity>>> call();
 }
@@ -45,7 +50,7 @@ abstract class IGetTempBetRepository {
 
 abstract class IDeleteTempBetRepository {
   Future<Either<IJackExceptions, bool>> call(
-      String userDocument, String paymentId);
+      String userDocument, String paymentId, String jackpotId);
 }
 ///////////////////////// EXTRA ///////////////////////////////
 

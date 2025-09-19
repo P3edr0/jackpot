@@ -9,6 +9,7 @@ import 'package:jackpot/core/store/core_controller.dart';
 import 'package:jackpot/presenter/features/payment/pages/components/widgets/card_payment_info.dart';
 import 'package:jackpot/presenter/features/payment/pages/components/widgets/pix_payment_info.dart';
 import 'package:jackpot/presenter/features/payment/pages/components/widgets/selectable_payment_method.dart';
+import 'package:jackpot/presenter/features/payment/pages/pix_page/store/pix_controller.dart';
 import 'package:jackpot/presenter/features/payment/pages/store/payment_controller.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
@@ -36,6 +37,12 @@ class _LoggedUserContentState extends State<LoggedUserContent> {
     super.initState();
     controller = Provider.of<PaymentController>(context, listen: false);
     coreController = Provider.of<CoreController>(context, listen: false);
+    final pixController = Provider.of<PixController>(context, listen: false);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      pixController.setIsPixPreview(false);
+      pixController.setPix(null);
+    });
   }
 
   @override

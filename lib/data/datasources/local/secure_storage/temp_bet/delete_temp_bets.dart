@@ -11,7 +11,7 @@ import 'package:jackpot/domain/mappers/temp_bet_entity_mapper.dart';
 class SecureStorageDeleteTempBet implements IDeleteTempBetDatasource {
   @override
   Future<Either<IJackExceptions, bool>> call(
-      String userDocument, String paymentId) async {
+      String userDocument, String paymentId, String jackpotId) async {
     const storage = FlutterSecureStorage();
     final key = userDocument;
     try {
@@ -26,7 +26,8 @@ class SecureStorageDeleteTempBet implements IDeleteTempBetDatasource {
       final temporaryBets = contents
           .map((content) => TempBetEntityMapper.fromJson(content))
           .toList();
-      temporaryBets.removeWhere((element) => element.paymentId == paymentId);
+      temporaryBets.removeWhere((element) =>
+          element.paymentId == paymentId && element.jackpotId == jackpotId);
       final handledBets =
           temporaryBets.map((element) => element.toString()).toList();
       final data = '{$handledBets}';

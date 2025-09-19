@@ -1,7 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:jackpot/components/buttons/rounded_button.dart';
+import 'package:jackpot/components/image.dart';
 import 'package:jackpot/domain/entities/team_entity.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
@@ -65,12 +64,9 @@ class MatchCard extends StatelessWidget {
                           children: [
                             Column(
                               children: [
-                                Image.network(
-                                  homeTeam.logo,
+                                JackImage(
+                                  image: homeTeam.logo,
                                   height: 60,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Image.memory(base64Decode(homeTeam.logo),
-                                          height: 60),
                                 ),
                                 SizedBox(
                                   height: Responsive.getHeightValue(6),
@@ -89,12 +85,9 @@ class MatchCard extends StatelessWidget {
                             ),
                             Column(
                               children: [
-                                Image.network(
-                                  visitTeam.logo,
+                                JackImage(
+                                  image: visitTeam.logo,
                                   height: 60,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Image.memory(base64Decode(visitTeam.logo),
-                                          height: 60),
                                 ),
                                 SizedBox(
                                   height: Responsive.getHeightValue(6),

@@ -34,7 +34,7 @@ class GetPixStatusDatasourceImpl implements IGetPixStatusDatasource {
         return const Right(PaymentStatus.success);
       }
       if (!handledData["pago"]) {
-        return const Right(PaymentStatus.success);
+        return const Right(PaymentStatus.waiting);
       }
       log('Erro desconhecido ao buscar PIX');
       return Left(BadRequestJackException());

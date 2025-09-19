@@ -13,6 +13,7 @@ class TempBetEntityMapper {
       pixQrCode: data['pixQrCode'],
       status: BetStatus.translate(data['status']),
       userDocument: data['userDocument'],
+      paymentValue: double.tryParse(data['paymentValue']),
     );
   }
 }

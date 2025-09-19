@@ -35,7 +35,8 @@ class _JackpotTeamPageState extends State<JackpotTeamPage> {
     controller = Provider.of<JackpotTeamController>(context, listen: false);
     jackpotController = Provider.of<JackpotController>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await controller.getTeamJackpots();
+      final newAwards = jackpotController.allAwards;
+      await controller.getTeamJackpots(newAwards);
     });
   }
 

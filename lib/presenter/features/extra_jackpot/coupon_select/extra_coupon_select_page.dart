@@ -480,10 +480,10 @@ class _ExtraCouponSelectPageState extends State<ExtraCouponSelectPage>
                                               2,
                                         ),
                                         image);
-                                    coreController.addShoppingCartItem(
-                                        jackpot.first,
-                                        couponsQuantity,
-                                        couponsPrice);
+                                    // coreController.addShoppingCartItem(
+                                    //     jackpot.first,
+                                    //     couponsQuantity,
+                                    //     couponsPrice);
                                   },
                                   child: Text(
                                     'Adicionar ao carrinho',

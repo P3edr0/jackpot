@@ -5,6 +5,7 @@ class TemporaryBetEntity {
   int couponQuantity;
   String jackpotId;
   double couponPrice;
+  double? paymentValue;
   String? pixCopyPaste;
   String? pixQrCode;
   BetStatus status;
@@ -14,6 +15,7 @@ class TemporaryBetEntity {
       {this.paymentId,
       this.pixCopyPaste,
       this.pixQrCode,
+      this.paymentValue,
       this.userDocument,
       this.createdAt,
       this.status = BetStatus.waitingPayment,
@@ -23,6 +25,6 @@ class TemporaryBetEntity {
 
   @override
   String toString() {
-    return '{"paymentId":"$paymentId","pixCopyPaste":"$pixCopyPaste","pixQrCode":"$pixQrCode", "createdAt":"$createdAt","status":"${status.name}","couponQuantity":"$couponQuantity","jackpotId":"$jackpotId", "couponPrice":"$couponPrice"}';
+    return '{"paymentId":"$paymentId","pixCopyPaste":"$pixCopyPaste","pixQrCode":"$pixQrCode", "createdAt":"$createdAt","status":"${status.name}","couponQuantity":"$couponQuantity","jackpotId":"$jackpotId", "couponPrice":"$couponPrice", "paymentValue":"$paymentValue"}';
   }
 }

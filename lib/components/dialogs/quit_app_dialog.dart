@@ -15,11 +15,12 @@ class QuitAppDialog {
         builder: (context) => AlertDialog(
               title: Text(title, textAlign: TextAlign.center),
               content: Text(content, textAlign: TextAlign.center),
+              actionsAlignment: MainAxisAlignment.center,
               actions: [
                 JackRoundedButton(
                   height: 50,
-                  width: Responsive.getHeightValue(100),
-                  onTap: () => Navigator.of(context).pop(),
+                  width: Responsive.getHeightValue(120),
+                  onTap: () => Navigator.of(context).pop(false),
                   child: Text(
                     "Voltar",
                     textAlign: TextAlign.center,

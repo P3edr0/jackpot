@@ -94,7 +94,8 @@ class JackpotChampionshipController extends ChangeNotifier {
     });
   }
 
-  Future<void> getChampionshipPreviewJackpots() async {
+  Future<void> getChampionshipPreviewJackpots(
+      List<AwardEntity> newAllAwards) async {
     setLoading(value: true);
     final response =
         await listByChampionshipJackpotUsecase(_selectedChampionshipId);
@@ -104,7 +105,13 @@ class JackpotChampionshipController extends ChangeNotifier {
 
       return null;
     }, (newChampionshipJackpots) async {
-      await _getAllAwards();
+      if (_allAwards.isEmpty) {
+        if (newAllAwards.isNotEmpty) {
+          _allAwards = [...newAllAwards];
+        } else {
+          await _getAllAwards();
+        }
+      }
 
       _championshipPreviewJackpots = newChampionshipJackpots;
 

@@ -37,20 +37,20 @@ class PaymentController extends ChangeNotifier {
   final CardPaymentUsecase cardPaymentUsecase;
   final GetPaymentPublicKeyUsecase getPaymentPublicKeyUsecase;
 
-  // final TextEditingController _cardCvv = TextEditingController();
-  // final TextEditingController _cardNumber = TextEditingController();
-  // final TextEditingController _expireCardDate = TextEditingController();
-  // final TextEditingController _nameOwnerCard = TextEditingController();
-  // final TextEditingController _cpfOwnerCard = TextEditingController();
-  final TextEditingController _cardCvv = TextEditingController(text: '123');
-  final TextEditingController _cardNumber =
-      TextEditingController(text: '4539620659922097');
-  final TextEditingController _expireCardDate =
-      TextEditingController(text: '12/2030');
-  final TextEditingController _nameOwnerCard =
-      TextEditingController(text: 'Pedro Neves alcantara');
-  final TextEditingController _cpfOwnerCard =
-      TextEditingController(text: '12496747608');
+  final TextEditingController _cardCvv = TextEditingController();
+  final TextEditingController _cardNumber = TextEditingController();
+  final TextEditingController _expireCardDate = TextEditingController();
+  final TextEditingController _nameOwnerCard = TextEditingController();
+  final TextEditingController _cpfOwnerCard = TextEditingController();
+  // final TextEditingController _cardCvv = TextEditingController(text: '123');
+  // final TextEditingController _cardNumber =
+  //     TextEditingController(text: '4539620659922097');
+  // final TextEditingController _expireCardDate =
+  //     TextEditingController(text: '12/2030');
+  // final TextEditingController _nameOwnerCard =
+  //     TextEditingController(text: 'Pedro Neves alcantara');
+  // final TextEditingController _cpfOwnerCard =
+  //     TextEditingController(text: '12496747608');
   final TextEditingController _cepController = TextEditingController();
   final TextEditingController _complementController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
@@ -96,7 +96,7 @@ class PaymentController extends ChangeNotifier {
   GlobalKey<FormState> get formKey => _formKey;
   GlobalKey<FormState> get cardFormKey => _cardFormKey;
   double? get totalValue => _totalValue;
-  double? get paymentValue => (_paymentCouponsQuantity! * _unitValue!);
+  double? get paymentValue => _getPaymentValue();
   double? get unitValue => _unitValue;
   bool get acceptTerms => _acceptTerms;
   bool get haveQuickPurchaseUser => quickPurchaseUser != null;
@@ -185,6 +185,14 @@ class PaymentController extends ChangeNotifier {
     notifyListeners();
   }
 
+  double? _getPaymentValue() {
+    if (_paymentCouponsQuantity == null || _unitValue == null) {
+      return null;
+    }
+    final payValue = _paymentCouponsQuantity! * _unitValue!;
+    return payValue;
+  }
+
   Future<void> getCepAddress() async {
     final String cep = cepController.text.replaceAll(RegExp('[.-]+'), '');
     final response = await cepService(cep);
@@ -220,7 +228,7 @@ class PaymentController extends ChangeNotifier {
     final email = _email ?? quickPurchaseUser!.email;
     final phone = _phone ?? quickPurchaseUser!.phone;
     final cardData = PaymentCard(
-        name: 'User Card',
+        name: _nameOwnerCard.text,
         token: encryptedCard!,
         type: _paymentType.paymentTypeLabel());
 
@@ -239,6 +247,7 @@ class PaymentController extends ChangeNotifier {
       _exception = error.message;
       setLoading(false);
     }, (newCardPaymentId) {
+      _exception = null;
       _cardPaymentId = newCardPaymentId;
       setLoading(false);
     });
@@ -253,7 +262,7 @@ class PaymentController extends ChangeNotifier {
 
   String? handledEncryptCard(String publicKey) {
     try {
-      final handledCardNumber = cardNumber.text;
+      final handledCardNumber = cardNumber.text.replaceAll(' ', '');
       final handledCardOwner = nameOwnerCard.text;
       final handledCardCvv = cardCvv.text;
       final cardExpireDate = expireCardDate.text;

@@ -31,7 +31,7 @@ class RegisterUserService {
 
         return Right(register);
       } else {
-        log('Erro: ${response.statusMessage}/n Code:${response.statusCode}');
+        log('Err oao criar token Bearer: ${response.statusMessage}/n Code:${response.statusCode}');
         return Left(BadRequestJackException(
             message: response.statusMessage ?? "Falha ao registrar usuário"));
       }

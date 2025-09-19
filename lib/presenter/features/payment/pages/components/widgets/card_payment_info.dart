@@ -136,13 +136,11 @@ class CardPaymentInfo extends StatelessWidget {
                                   inputType: TextInputType.number,
                                   validator: (value) {
                                     final content = value as String;
-                                    if (content.length < 5) {
-                                      return '12/25 ou 12/2025';
+                                    if (content.length < 7) {
+                                      return 'Ex: 12/2025';
                                     }
                                     String year = content.split('/')[1];
-                                    if (year.length == 2) {
-                                      year = '20$year';
-                                    }
+
                                     final handledYear = int.parse(year);
 
                                     final currentYear = DateTime.now().year;

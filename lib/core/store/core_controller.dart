@@ -2,10 +2,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:jackpot/data/datasources/auth/delete_user_datasource_impl.dart';
-import 'package:jackpot/domain/entities/jackpot_entity.dart';
 import 'package:jackpot/domain/entities/new_user_entity.dart';
 import 'package:jackpot/domain/entities/quick_purchase_user_entity.dart';
 import 'package:jackpot/domain/entities/session_entity.dart';
+import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/domain/usecases/session/delete_session_usecase.dart';
 import 'package:jackpot/domain/usecases/session/get_session_usecase.dart';
 import 'package:jackpot/presenter/features/auth/login/login_store/login_controller.dart';
@@ -46,7 +46,7 @@ class CoreController extends ChangeNotifier {
 
   saveLocalBet() {}
   void addShoppingCartItem(
-      JackpotEntity jackpot, int couponsQuantity, double couponsPrice) {
+      SportJackpotEntity jackpot, int couponsQuantity, double couponsPrice) {
     shoppingCartController.addShoppingCartItem(
         jackpot, couponsQuantity, couponsPrice, user?.uzerId.toString());
   }

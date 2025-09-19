@@ -3,6 +3,7 @@ import 'package:jackpot/data/datasources/base_datasources/jackpot/bet/create_bet
 import 'package:jackpot/data/datasources/base_datasources/jackpot/bet/create_temp_bet_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/bet/get_temp_bets_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/extra/fetch_extra_jackpot_datasource.dart';
+import 'package:jackpot/data/datasources/base_datasources/jackpot/fetch_all_resume_jackpot_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/fetch_all_team_jackpot_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/get_jackpot_datasource.dart';
 import 'package:jackpot/data/datasources/base_datasources/jackpot/group_by_championship_jackpot_datasource.dart';
@@ -12,6 +13,7 @@ import 'package:jackpot/domain/entities/bet_entity.dart';
 import 'package:jackpot/domain/entities/championship_entity.dart';
 import 'package:jackpot/domain/entities/extra_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/preview_jackpot_entity.dart';
+import 'package:jackpot/domain/entities/resume_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/domain/entities/team_entity.dart';
 import 'package:jackpot/domain/entities/temporary_bet_entity.dart';
@@ -63,6 +65,18 @@ class ListByChampionshipJackpotRepositoryImpl
   Future<Either<IJackExceptions, List<PreviewJackpotEntity>>> call(
       String championshipId) async {
     final response = await datasource(championshipId);
+    return response;
+  }
+}
+
+class FetchAllResumeJackpotRepositoryImpl
+    implements IFetchAllResumeJackpotRepository {
+  FetchAllResumeJackpotRepositoryImpl({required this.datasource});
+  IFetchAllResumeJackpotDatasource datasource;
+
+  @override
+  Future<Either<IJackExceptions, List<ResumeJackpotEntity>>> call() async {
+    final response = await datasource();
     return response;
   }
 }

@@ -13,10 +13,11 @@ void main() {
 
   final localeProvider = LocaleController.instance();
   final routeObserver = RouteStackObserver.instance();
+
   runApp(MultiProvider(
     providers: Providers.providers,
     child: MaterialApp(
-      title: 'MinerPro',
+      title: 'Jackpot',
       navigatorObservers: [routeObserver],
       theme: JackAppTheme.lightTheme,
       themeMode: ThemeMode.light,

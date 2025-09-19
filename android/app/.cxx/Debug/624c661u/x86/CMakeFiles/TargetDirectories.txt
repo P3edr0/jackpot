@@ -1,0 +1,2 @@
+C:/Users/fodab/development/freelance/jackpot/jackpot_backup/jackpot/android/app/.cxx/Debug/624c661u/x86/CMakeFiles/edit_cache.dir
+C:/Users/fodab/development/freelance/jackpot/jackpot_backup/jackpot/android/app/.cxx/Debug/624c661u/x86/CMakeFiles/rebuild_cache.dir

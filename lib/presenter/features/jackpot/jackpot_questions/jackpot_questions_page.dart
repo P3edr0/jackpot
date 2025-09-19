@@ -8,10 +8,13 @@ import 'package:jackpot/components/dialogs/info_dialog.dart';
 import 'package:jackpot/components/dialogs/quit_questions_dialog.dart';
 import 'package:jackpot/components/loadings/loading.dart';
 import 'package:jackpot/core/store/core_controller.dart';
+import 'package:jackpot/domain/entities/question_collection_entity.dart';
 import 'package:jackpot/domain/entities/sport_jackpot_entity.dart';
 import 'package:jackpot/presenter/features/jackpot/coupon_select/store/coupon_select_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_questions/components/question_card.dart';
 import 'package:jackpot/presenter/features/jackpot/jackpot_questions/store/jackpot_questions_controller.dart';
+import 'package:jackpot/presenter/features/jackpot/my_jackpots/pages/my_jackpots/store/my_jackpots_controller.dart';
+import 'package:jackpot/presenter/features/jackpot/my_jackpots/pages/my_jackpots_details/store/my_jackpots_details_controller.dart';
 import 'package:jackpot/presenter/features/jackpot/store/jackpot_controller.dart';
 import 'package:jackpot/presenter/features/payment/pages/store/payment_controller.dart';
 import 'package:jackpot/responsiveness/leg_font_style.dart';
@@ -58,7 +61,7 @@ class _JackpotQuestionsPageState extends State<JackpotQuestionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PopScope(
-        canPop: true,
+        canPop: false,
         onPopInvokedWithResult: (bool didPop, Object? result) async {
           if (didPop) {
             return;
@@ -260,53 +263,103 @@ class _JackpotQuestionsPageState extends State<JackpotQuestionsPage> {
                                   builder: (context, controller, child) {
                                 final jackpot = controller.selectedJackpot!;
                                 final questions = jackpot.questions.items;
-                                return ListView.separated(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    separatorBuilder: (context, index) =>
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                    itemCount: questions.length,
-                                    itemBuilder: (context, index) {
-                                      final question =
-                                          questions[index].question;
-                                      final isObjective = questions[index]
-                                          .questionType
-                                          .isObjective;
-                                      final isSingle = questions[index]
-                                          .questionQuantity
-                                          .isSingle;
-                                      final level = questions[index].potLevel;
-                                      final bool isPreview =
-                                          controller.isQuestionsPreview;
-                                      final auxContent = questions[index]
-                                          .subjDoubleValue
-                                          .replaceAll(',', ' ');
-                                      List<String> options = [];
-                                      if (isObjective) {
-                                        options = questions[index].objOptions;
-                                      }
-                                      final questionStructure = controller
-                                          .questionsStructure.questions[index];
-                                      if (question.trim().isEmpty) {
-                                        return const SizedBox();
-                                      }
+                                Map<int, List<QuestionCollectionEntity>>
+                                    collections = {};
+                                for (int index = 0;
+                                    index < questions.length;
+                                    index++) {
+                                  final question = questions[index].question;
+                                  final isObjective =
+                                      questions[index].questionType.isObjective;
+                                  final isSingle = questions[index]
+                                      .questionQuantity
+                                      .isSingle;
+                                  final level = questions[index].potLevel;
+                                  final bool isPreview =
+                                      controller.isQuestionsPreview;
+                                  final auxContent = questions[index]
+                                      .subjDoubleValue
+                                      .replaceAll(',', ' ');
+                                  List<String> options = [];
+                                  if (isObjective) {
+                                    options = questions[index].objOptions;
+                                  }
+                                  final questionStructure = controller
+                                      .questionsStructure.questions[index];
 
-                                      return QuestionCard(
-                                        level: level,
-                                        question: question,
-                                        isObjective: isObjective,
-                                        options: options,
-                                        isSingle: isSingle,
-                                        auxContent: auxContent,
-                                        constraints: constraints,
-                                        questionStructure: questionStructure,
-                                        questionIndex: index,
-                                        isPreview: isPreview,
-                                      );
-                                    });
+                                  final handledItem = QuestionCollectionEntity(
+                                    level: level,
+                                    question: question,
+                                    isObjective: isObjective,
+                                    options: options,
+                                    isSingle: isSingle,
+                                    auxContent: auxContent,
+                                    constraints: constraints,
+                                    questionStructure: questionStructure,
+                                    questionIndex: index,
+                                    isPreview: isPreview,
+                                  );
+                                  final item = collections[level];
+                                  if (item == null) {
+                                    collections.putIfAbsent(
+                                      level,
+                                      () => [handledItem],
+                                    );
+                                  } else {
+                                    collections.update(level,
+                                        (value) => [...value, handledItem]);
+                                  }
+                                }
+                                // return
+
+                                // ListView.separated(
+                                //     physics:
+                                //         const NeverScrollableScrollPhysics(),
+                                //     shrinkWrap: true,
+                                //     separatorBuilder: (context, index) =>
+                                //         const SizedBox(
+                                //           height: 10,
+                                //         ),
+                                //     itemCount: questions.length,
+                                //     itemBuilder: (context, index) {
+                                //       final question =
+                                //           questions[index].question;
+                                //       final isObjective = questions[index]
+                                //           .questionType
+                                //           .isObjective;
+                                //       final isSingle = questions[index]
+                                //           .questionQuantity
+                                //           .isSingle;
+                                //       final level = questions[index].potLevel;
+                                //       final bool isPreview =
+                                //           controller.isQuestionsPreview;
+                                //       final auxContent = questions[index]
+                                //           .subjDoubleValue
+                                //           .replaceAll(',', ' ');
+                                //       List<String> options = [];
+                                //       if (isObjective) {
+                                //         options = questions[index].objOptions;
+                                //       }
+                                //       final questionStructure = controller
+                                //           .questionsStructure.questions[index];
+                                //       if (question.trim().isEmpty) {
+                                //         return const SizedBox();
+                                //       }
+
+                                return QuestionCard(
+                                  collections: collections,
+                                  // level: level,
+                                  // question: question,
+                                  // isObjective: isObjective,
+                                  // options: options,
+                                  // isSingle: isSingle,
+                                  // auxContent: auxContent,
+                                  // constraints: constraints,
+                                  // questionStructure: questionStructure,
+                                  // questionIndex: index,
+                                  // isPreview: isPreview,
+                                );
+                                // });
                               }),
                               SizedBox(
                                 height: Responsive.getHeightValue(10),
@@ -383,10 +436,6 @@ class _JackpotQuestionsPageState extends State<JackpotQuestionsPage> {
                                                             child) =>
                                                         InkWell(
                                                       onTap: () {
-                                                        final controller = Provider
-                                                            .of<JackpotQuestionsController>(
-                                                                context,
-                                                                listen: false);
                                                         controller
                                                             .setAcceptTerms();
                                                       },
@@ -506,6 +555,11 @@ class _JackpotQuestionsPageState extends State<JackpotQuestionsPage> {
                                                               "Estas respostas não poderão mais ser alteradas após confirmar.",
                                                               context,
                                                               () async {
+                                                            Navigator.pop(
+                                                                context);
+                                                            controller
+                                                                .setLoading(
+                                                                    true);
                                                             final couponController =
                                                                 Provider.of<
                                                                         CouponSelectController>(
@@ -547,32 +601,34 @@ class _JackpotQuestionsPageState extends State<JackpotQuestionsPage> {
                                                             final amount =
                                                                 couponController
                                                                     .totalValue;
+                                                            final couponPrice =
+                                                                couponController
+                                                                    .couponPrice;
                                                             final betId =
                                                                 jackController
                                                                     .selectedJackpot!
                                                                     .first
                                                                     .betId;
+                                                            final jackpotId =
+                                                                jackController
+                                                                    .selectedJackpot!
+                                                                    .first
+                                                                    .id;
 
-                                                            controller
-                                                                .setLoading();
-                                                            final result =
-                                                                await jackController.createBet(
-                                                                    paymentId:
-                                                                        paymentId,
-                                                                    userDocument:
-                                                                        userDocument,
-                                                                    userEmail:
-                                                                        userEmail,
-                                                                    userName:
-                                                                        userName,
-                                                                    betId:
-                                                                        betId!,
-                                                                    answers:
-                                                                        answers,
-                                                                    amount:
-                                                                        amount);
-                                                            controller
-                                                                .setLoading();
+                                                            final result = await jackController.createBet(
+                                                                paymentId:
+                                                                    paymentId,
+                                                                userDocument:
+                                                                    userDocument,
+                                                                userEmail:
+                                                                    userEmail,
+                                                                userName:
+                                                                    userName,
+                                                                betId: betId!,
+                                                                answers:
+                                                                    answers,
+                                                                couponPrice:
+                                                                    couponPrice);
 
                                                             if (result &&
                                                                 context
@@ -588,7 +644,9 @@ class _JackpotQuestionsPageState extends State<JackpotQuestionsPage> {
                                                                     paymentId:
                                                                         paymentId,
                                                                     userDocument:
-                                                                        userDocument);
+                                                                        userDocument,
+                                                                    jackpotId:
+                                                                        jackpotId);
                                                                 controller
                                                                     .betQueue
                                                                     .removeWhere((bet) =>
@@ -606,6 +664,9 @@ class _JackpotQuestionsPageState extends State<JackpotQuestionsPage> {
                                                                     .setSelectedJackpot([
                                                                   newBet
                                                                 ]);
+                                                                controller
+                                                                    .setLoading(
+                                                                        false);
                                                                 if (_targetKey
                                                                         .currentContext !=
                                                                     null) {
@@ -625,9 +686,12 @@ class _JackpotQuestionsPageState extends State<JackpotQuestionsPage> {
                                                                         controller
                                                                             .betQueue,
                                                                     betAnswers: []);
-                                                                Navigator.pop(
-                                                                    context);
+                                                                // Navigator.pop(
+                                                                //     context);
                                                               } else {
+                                                                controller
+                                                                    .setLoading(
+                                                                        true);
                                                                 couponController
                                                                     .setCouponsBaseQuantity(
                                                                         CouponsBaseQuantity
@@ -636,19 +700,57 @@ class _JackpotQuestionsPageState extends State<JackpotQuestionsPage> {
                                                                     paymentId:
                                                                         paymentId,
                                                                     userDocument:
-                                                                        userDocument);
+                                                                        userDocument,
+                                                                    jackpotId:
+                                                                        jackpotId);
                                                                 await InfoDialog
                                                                     .closeAuto(
                                                                         "Sucesso",
                                                                         "Cartela criada com sucesso.\n Aguarde o resultado da partida.",
                                                                         context);
-                                                                await Navigator
-                                                                    .pushNamedAndRemoveUntil(
+
+                                                                final myJackpotsController =
+                                                                    Provider.of<
+                                                                            MyJackpotsController>(
                                                                         context,
+                                                                        listen:
+                                                                            false);
+
+                                                                final jack =
+                                                                    controller
+                                                                        .selectedJackpot!;
+                                                                await myJackpotsController
+                                                                    .getJackpotBetMade(
+                                                                        userDocument,
+                                                                        jack.id);
+
+                                                                final detailsController =
+                                                                    Provider.of<
+                                                                            MyJackpotsDetailsController>(
+                                                                        context,
+                                                                        listen:
+                                                                            false);
+                                                                final userBets =
+                                                                    myJackpotsController
+                                                                        .getUserSelectedJackpotBets(
+                                                                            jack);
+
+                                                                detailsController
+                                                                    .setSelectedBetJackpot(
+                                                                        jack);
+                                                                detailsController
+                                                                    .setSelectedBets(
+                                                                        userBets);
+                                                                controller
+                                                                    .setLoading(
+                                                                        false);
+                                                                await Navigator.pushNamedAndRemoveUntil(
+                                                                    context,
+                                                                    AppRoutes
+                                                                        .myJackpotsDetails,
+                                                                    ModalRoute.withName(
                                                                         AppRoutes
-                                                                            .home,
-                                                                        (route) =>
-                                                                            true);
+                                                                            .home));
 
                                                                 controller
                                                                     .clearFields();

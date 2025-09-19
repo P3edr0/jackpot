@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:jackpot/core/store/core_controller.dart';
+import 'package:jackpot/presenter/features/jackpot/store/jackpot_controller.dart';
 import 'package:jackpot/presenter/features/shopping_cart/store/shopping_cart_controller.dart';
 import 'package:jackpot/responsiveness/responsive.dart';
 import 'package:jackpot/shared/utils/routes/app_routes.dart';
@@ -20,8 +23,12 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     final controller = Provider.of<CoreController>(context, listen: false);
+    final jackpotController =
+        Provider.of<JackpotController>(context, listen: false);
     final shoppingCartController =
         Provider.of<ShoppingCartController>(context, listen: false);
+    unawaited(jackpotController.fetchAllJackpots());
+    unawaited(jackpotController.getAllAwards());
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await controller.getSession();
       shoppingCartController.getLocalCart(null);

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:curl_logger_dio_interceptor/curl_logger_dio_interceptor.dart';
@@ -16,23 +15,18 @@ class GetPaymentPublicKeyDatasourceImpl
     dio.interceptors.add(CurlLoggerDioInterceptor());
     try {
       final response =
-          await dio.post('${JackEnvironment.paymentExternalApi}public-keys',
-              data: json.encode({"type": "card"}),
+          await dio.get('${JackEnvironment.paymentApi}payments/public-key/card',
               options: Options(
                 headers: {
                   "accept": "application/json",
-                  "Content-type": "application/json",
-                  "x-client-id": "1",
-                  "x-client-secret": "1",
-                  "Authorization":
-                      "Bearer ${JackEnvironment.paymentExternalToken}"
+                  "x-api-key": JackEnvironment.paymentApiKey
                 },
               ));
 
       final data = response.data;
 
       final handledData = Map<String, dynamic>.from(data);
-      final publicKey = handledData["public_key"];
+      final publicKey = handledData["chavePublica"];
 
       return Right(publicKey);
     } catch (e, data) {

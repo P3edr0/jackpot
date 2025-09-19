@@ -9,7 +9,9 @@ class DeleteTempBetUsecase {
   IDeleteTempBetRepository repository;
 
   Future<Either<IJackExceptions, bool>> call(
-      {required String userDocument, required String paymentId}) async {
-    return repository(userDocument, paymentId);
+      {required String userDocument,
+      required String paymentId,
+      required String jackpotId}) async {
+    return repository(userDocument, paymentId, jackpotId);
   }
 }

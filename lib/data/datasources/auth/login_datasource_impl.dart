@@ -46,7 +46,8 @@ class LoginDatasourceImpl implements ILoginDatasource {
           }),
           options: Options(headers: {
             "Content-type": "application/json; charset=UTF-8",
-            "Authorization": tokenGenerator.basicToken!.generate(),
+            "Authorization":
+                "Basic YTcxNWJjNzVhMmFiZDdiYTRhYTVhMmZiMjc3MTc3YzY6NTU2ZGUzN2M4MTI1OWJiY2ZlZjhlNWYwNjQwOTFmMWI=", //tokenGenerator.basicToken!.generate(),
             "deviceid": JackEnvironment.deviceId
           }));
 
